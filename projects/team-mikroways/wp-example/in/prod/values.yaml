@@ -34,7 +34,7 @@ argo-project:
 
     applicationRequirements:
       enabled: true
-      repoUrl: https://charts.bitnami.com/bitnami
+      repoURL: https://charts.bitnami.com/bitnami
       targetRevision: 15.2.x
       chart: mariadb
       helm:
@@ -58,7 +58,7 @@ argo-project:
 
     application:
       enabled: true
-      repoUrl: https://charts.bitnami.com/bitnami
+      repoURL: https://charts.bitnami.com/bitnami
       targetRevision: 15.2.x
       chart: wordpress
       helm:
