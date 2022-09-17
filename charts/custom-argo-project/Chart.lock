@@ -1,0 +1,6 @@
+dependencies:
+- name: argo-project
+  repository: oci://registry.gitlab.com/mikroways/k8s/charts/gitops/argo-project
+  version: 1.0.0
+digest: sha256:b67f8a5db8fc8aed86d996f0cacc813ee708d7f9cc525cf9aab82171f5294ee5
+generated: "2022-09-16T11:49:53.070276113-03:00"

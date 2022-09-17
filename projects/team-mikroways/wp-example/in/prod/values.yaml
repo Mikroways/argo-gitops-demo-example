@@ -1,0 +1,75 @@
+argo-project:
+  registrySecret:
+    dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5pbnRhLmdvYi5hciI6eyJ1c2VybmFtZSI6InBlcGUiLCJwYXNzd29yZCI6InBhc3MiLCJhdXRoIjoiY0dWd1pUcHdZWE56In19fQ==
+  argo:
+    readOnlyGroups:
+      - grupo-ro-01
+      - grupo-ro-02
+    adminGroups:
+      - grupo-admin-01
+
+    baseApplication:
+      helm:
+        values: |
+          quota:
+            requests:
+              cpu: '4'
+              memory: 8Gi
+            limits:
+              cpu: '4'
+              memory: 8Gi
+            pods: "10"
+            persistentvolumeclaims: "5"
+            resourcequotas: "1"
+            services: "5"
+
+          limits:
+            default:
+              cpu: 200m
+              memory: 512Mi
+            defaultRequest:
+              cpu: 100m
+              memory: 256Mi
+            type: Container
+
+    applicationRequirements:
+      enabled: true
+      repoUrl: https://charts.bitnami.com/bitnami
+      targetRevision: 15.2.x
+      chart: mariadb
+      helm:
+        values: |
+          fullnameOverride: wp-db
+          architecture: standalone
+          auth:
+            rootPassword: rootpass123
+            database: wordpress
+            username: wpuser
+            password: wppass
+          primary:
+            persistence:
+              enabled: true
+              storageClass: ""
+              accessModes:
+                - ReadWriteOnce
+              size: 1Gi
+      syncPolicy:
+        automated: {}
+
+    application:
+      enabled: true
+      repoUrl: https://charts.bitnami.com/bitnami
+      targetRevision: 15.2.x
+      chart: wordpress
+      helm:
+        values: |
+          mariadb:
+            enabled: false
+          externalDatabase:
+            host: wp-db
+            port: 3306
+            user: wpuser
+            password: wppass
+            database: wordpress
+      syncPolicy:
+        automated: {}

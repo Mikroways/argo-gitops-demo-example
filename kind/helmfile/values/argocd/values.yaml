@@ -1,0 +1,8 @@
+---
+server:
+  config:
+    exec.enabled: "true"
+configs:
+  secret:
+    # admin password is mikroways
+    argocdServerAdminPassword: $2a$10$dsTwvxtgWugKmwV8cS9XuuBtDjUFnjI1/lKADNPx.ahujPnK1YWLe

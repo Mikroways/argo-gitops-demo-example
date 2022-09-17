@@ -1,0 +1,6 @@
+---
+argo-project:
+  baseApplication:
+    repoUrl: registry.gitlab.com/mikroways/k8s/charts/gitops/argo-base-app
+    targetRevision: 1.0.0
+    chart: argo-base-app

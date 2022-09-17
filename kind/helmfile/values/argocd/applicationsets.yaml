@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+    name: argo-gitops
+spec:
+  generators:
+    - git:
+        repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/argo-gitops-demo-example.git
+        revision: HEAD
+        files:
+            - path: projects/**/values.yaml
+  template:
+    metadata:
+      name: '{{path[1]}}-{{path[2]}}-{{path[3]}}-{{path[4]}}'
+    spec:
+      syncPolicy:
+        automated:
+          prune: false
+          selfHeal: true
+      project: default
+      source:
+        path: charts/custom-argo-project
+        repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/argo-gitops-demo-example.git
+        targetRevision: HEAD
+        helm:
+          values: |
+            argo-project:
+              namespace: '{{path[1]}}-{{path[2]}}-{{path[4]}}'
+              cluster:
+                name: '{{ path[3] }}'
+                nameSuffix: 'cluster'
+              argo:
+                namespace: argocd
+                baseApplication:
+                  helm:
+                    parameters:
+                      - name: namespace
+                        values: '{{path[1]}}-{{path[2]}}-{{path[4]}}'
+          valueFiles:
+            - ../../{{path}}/values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: default

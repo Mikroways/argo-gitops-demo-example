@@ -1,0 +1,24 @@
+repositories:
+  - name: argocd
+    url: https://argoproj.github.io/argo-helm
+releases:
+- name: argocd
+  namespace: argocd
+  chart: argocd/argo-cd
+  version: 5.4.*
+  values:
+    - ../values/argocd/values.yaml
+  secrets:
+    - ../values/argocd/secrets.yaml
+  hooks:
+    - events:
+        - "postsync"
+      showlogs: true
+      command: kubectl
+      args:
+        - --namespace
+        - '{{`{{ .Release.Namespace }}`}}'
+        - apply
+        - -f
+        - ../values/argocd/applicationsets.yaml
+
