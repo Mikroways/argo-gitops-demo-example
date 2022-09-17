@@ -35,7 +35,7 @@ argo-project:
     applicationRequirements:
       enabled: true
       repoURL: https://charts.bitnami.com/bitnami
-      targetRevision: 15.2.x
+      targetRevision: 11.3.x
       chart: mariadb
       helm:
         values: |
