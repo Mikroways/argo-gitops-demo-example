@@ -1,6 +1,4 @@
 argo-project:
-  registrySecret:
-    dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5pbnRhLmdvYi5hciI6eyJ1c2VybmFtZSI6InBlcGUiLCJwYXNzd29yZCI6InBhc3MiLCJhdXRoIjoiY0dWd1pUcHdZWE56In19fQ==
   argo:
     readOnlyGroups:
       - grupo-ro-01
