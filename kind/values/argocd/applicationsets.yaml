@@ -35,7 +35,9 @@ spec:
                   helm:
                     parameters:
                       - name: namespace
-                        values: '{{path[1]}}-{{path[2]}}-{{path[4]}}'
+                        value: '{{path[1]}}-{{path[2]}}-{{path[4]}}'
+                  syncPolicy:
+                    automated: {}
           valueFiles:
             - ../../{{path}}/values.yaml
       destination:

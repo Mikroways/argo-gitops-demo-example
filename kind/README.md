@@ -11,7 +11,7 @@ En este mismo directorio, proveemos un `.envrc` que setea la variable
 Procedemos entonces a crear un cluster kind:
 
 ```
-kund create cluster
+kind create cluster
 ```
 
 Luego, instalamos las herramientas necesarias con helmfile:
@@ -26,6 +26,4 @@ INFO del chart de argocd. Recordar que la contraseña de admin, es **mikroways**
 La instalación de argocd, utiliza helm secrets con una clave KMS de mikroways
 que garantiza que argocd configure un repositorio que pueda acceder a descargar
 el chart de helm.
-
-
 

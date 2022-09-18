@@ -1,4 +1,6 @@
 ---
+dex:
+  enabled: false
 server:
   config:
     exec.enabled: "true"
