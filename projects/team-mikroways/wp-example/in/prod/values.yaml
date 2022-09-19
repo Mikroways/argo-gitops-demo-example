@@ -70,6 +70,8 @@ argo-project:
         values: |
           mariadb:
             enabled: false
+          service:
+            type: ClusterIP
           resources:
             limits:
               cpu: 500m
