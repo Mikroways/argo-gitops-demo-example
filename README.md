@@ -26,6 +26,16 @@ para la gestión de despliegues basada en gitops.
   * Probar nuevas funcionalides en un despliegue específico sin afectar al resto
   * Poder aplicar cambios masivos con el menor esfuerzo posible
 
+### Algunas confusiones explicadas
+
+Si se utilizan helm chart con repositorios OCI, entonces se debe considerar que
+si se configura un repositorio `registry.gitlab.com/mikroways/proyecto/app` y
+luego se trata de configurar otro, por ejemplo
+`registry.gitlab.com/mikroways/otro-proyecto/otra-app` entonces no funcionará
+porque uno de los dos será tomado por helm. Evidentemente el comando `helm
+registry login` no considera el path para diferenciar registries, al igual que
+sucede con docker.
+
 ## ¿Cómo funciona?
 
 Una vez instalado ArgoCD con soporte de ApplicationSets, se crea un appset
