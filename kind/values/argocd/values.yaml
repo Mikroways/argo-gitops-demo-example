@@ -20,6 +20,18 @@ configs:
     argocdServerAdminPassword: $2a$10$dsTwvxtgWugKmwV8cS9XuuBtDjUFnjI1/lKADNPx.ahujPnK1YWLe
 
 repoServer:
+  serviceAccount:
+    create: true
+    name: argocd-repo-server
+
+  rbac:
+    - apiGroups:
+      - ""
+      resources:
+        - secrets
+      verbs:
+        - get
+
   env:
     - name: HELM_PLUGINS
       value: /custom-tools/helm-plugins/
