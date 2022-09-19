@@ -27,3 +27,17 @@ La instalación de argocd, utiliza helm secrets con una clave KMS de mikroways
 que garantiza que argocd configure un repositorio que pueda acceder a descargar
 el chart de helm.
 
+## Helm secrets
+
+Los secretos que desencripta ArgoCD podrán encriptarse con las siguiente age
+pubic key:
+
+```
+age193tt38de3fzuujax2krt450mfpaf25zc957h6qp7nrp2uxzj3apsywa3sz
+```
+
+Por ejemplo, bajo el directorio [`proyectos/`](../proyectos) se define esta
+clave como recipiente de AGE. La clave privada está encriptada a su vez con sops
+pero con kms
+
+

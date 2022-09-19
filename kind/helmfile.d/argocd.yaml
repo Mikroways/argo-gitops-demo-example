@@ -21,4 +21,12 @@ releases:
         - apply
         - -f
         - ../values/argocd/applicationsets.yaml
-
+    - events:
+        - "postsync"
+      showlogs: true
+      command: sh
+      args:
+        - -c
+        - sops -d ../values/argocd/helm-age-secret.yaml |
+          kubectl --namespace '{{`{{ .Release.Namespace }}`}}'
+          apply -f -
