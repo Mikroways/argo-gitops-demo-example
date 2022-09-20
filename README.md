@@ -26,7 +26,7 @@ para la gestión de despliegues basada en gitops.
   * Probar nuevas funcionalides en un despliegue específico sin afectar al resto
   * Poder aplicar cambios masivos con el menor esfuerzo posible
 
-### Algunas confusiones explicadas
+### Algunas confusiones con helm registries
 
 Si se utilizan helm chart con repositorios OCI, entonces se debe considerar que
 si se configura un repositorio `registry.gitlab.com/mikroways/proyecto/app` y
@@ -76,13 +76,24 @@ El ApplicationSet que da vida a este flujo se llama `equipos-por-producto`.
 
 TODO
 
+## Instanciando la infraestructura para evidenciar cómo funciona
+
+Ingresar en la carpeta [`kind/`](./kind) y seguir las instrucciones del readme.
+
 ## El chart en este repositorio
 
 Analizando el ApplicationSet del escenario correspondiente, se podrá
-identificar que la lógica empleada es la de generar valores a partir de la
-estructura de directorios correspondiente al escenario. Además, la de utilizar
-en cada Application generado, un `valueFiles:` que tomará el valor del
-`values.yaml` que representan a un Application determinado. 
+identificar que la lógica es empleada para generar valores a partir de la
+estructura de directorios correspondiente al escenario. Además, la idea es que
+cada Application generado, utilice un `valueFiles:` que tomará el valor del
+`values.yaml` que representan a un Application determinado. Utilizando la
+propiedad `ignoreMissingValueFiles` permitimos entonces que se puedan
+generalizar valores para equipos. Lo mismo hemos hecho con los secretos, para
+por ejemplo almacenar los imagePullSecrets de forma segura.
+
+> La instrucción `ignoreMissingValueFiles` **no funciona con helm secrets**.
+> Entonces si un secret.yaml no es necesario para un equipo, se debe crear este
+> archivo en blanco. Ver ejemplo de wordpress respecto del de redmine
 
 ### Las aplicaciones del chart
 
