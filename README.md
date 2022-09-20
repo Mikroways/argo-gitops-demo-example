@@ -10,7 +10,7 @@ para la gestión de despliegues basada en gitops.
 * Los despliegues de servicios de base, como ser CSI, ingress controllers,
   monitoreo y demás, se recomienda no manejarlos con ArgoCD. No al menos en este
   contexto.
-* Este repositorio, debe contener un chart que es simplementeun wrapper del
+* Este repositorio, debe contener un chart que es simplemente un wrapper del
   chart que da [origen al flujo](https://gitlab.com/mikroways/k8s/charts/gitops/argo-project).
   La razón, es que para que el flujo sea GitOps desde sus inicios, necesitamos
   un chart con los values en el mismo repositorio, para poder justamente crear
