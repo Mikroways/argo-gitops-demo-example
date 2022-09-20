@@ -23,7 +23,6 @@ spec:
         repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/argo-gitops-demo-example.git
         targetRevision: HEAD
         helm:
-          ignoreMissingValueFiles: true
           values: |
             argo-project:
               namespace: '{{path[1]}}-{{path[2]}}-{{path[4]}}'
@@ -40,9 +39,7 @@ spec:
                   syncPolicy:
                     automated: {}
           valueFiles:
-            - ../../{{path}}/values.yaml
-            - ../../{{path[0]}}/{{path[1]}}/{{path[2]}}/values.yaml
-            - secrets+age-import-kubernetes://argocd/helm-secrets-age-private-key#key.txt?../../{{path[0]}}/{{path[1]}}/{{path[2]}}/secret.yaml
+            - secrets+age-import-kubernetes://argocd/helm-secrets-age-private-key#key.txt?../../{{path}}/values.yaml
       destination:
         server: https://kubernetes.default.svc
         namespace: default

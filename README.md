@@ -36,6 +36,47 @@ porque uno de los dos será tomado por helm. Evidentemente el comando `helm
 registry login` no considera el path para diferenciar registries, al igual que
 sucede con docker.
 
+Por otro lado, argocd, cuando evalúa qué repositorio utilizar para una
+aplicación que directamente configure un repositorio OCI helm, requiere que
+exista un repositorio en argocd con la URL completa a la registry.
+
+#### Ejemplos
+
+* Un chart en un repositorio git define como dependencia
+  `registry.gitlab.com/mikroways/proyecto/app`. Otro chart también en git define
+  como dependencia `registry.gitlab.com/mikroways/otro-proyecto/otra-app`
+  entonces creando un repositorio en argo con el siguiente formato será
+  suficiente:
+
+```
+url: registry.gitlab.com/mikroways
+name: xxxx
+type: helm
+username: user
+password: pass
+```
+
+> ¡El usuario debe poder acceder a ambos repositorios!
+
+* Una aplicación ArgoCD define como repositorio un chart en una registry OCI.
+  Pongamos como ejemplo, el argo-base-app, cuya registry es
+  `registry.gitlab.com/mikroways/k8s/charts/gitops/argo-base-app` y el chart se
+  llama `argo-base-app`. En este caso, no alcanza con el anterior repositorio en
+  ArgoCD. Argo buscará un poresitorio con la URL completa. Por ello, a pesar de
+  existir un repositorio como el indicado anteriormente, se debe crear uno como se
+  explica a continuación: 
+
+```
+url: registry.gitlab.com/mikroways/k8s/charts/gitops/argo-base-app
+name: xxxx
+type: helm
+username: user
+password: pass
+```
+
+> Considerar que incluso puede usarse el **mismo user y password que en el
+> repositorio anterior, porque lo que debe existir es la URL completa**
+
 ## ¿Cómo funciona?
 
 Una vez instalado ArgoCD con soporte de ApplicationSets, se crea un appset
@@ -86,14 +127,9 @@ Analizando el ApplicationSet del escenario correspondiente, se podrá
 identificar que la lógica es empleada para generar valores a partir de la
 estructura de directorios correspondiente al escenario. Además, la idea es que
 cada Application generado, utilice un `valueFiles:` que tomará el valor del
-`values.yaml` que representan a un Application determinado. Utilizando la
-propiedad `ignoreMissingValueFiles` permitimos entonces que se puedan
-generalizar valores para equipos. Lo mismo hemos hecho con los secretos, para
-por ejemplo almacenar los imagePullSecrets de forma segura.
-
-> La instrucción `ignoreMissingValueFiles` **no funciona con helm secrets**.
-> Entonces si un secret.yaml no es necesario para un equipo, se debe crear este
-> archivo en blanco. Ver ejemplo de wordpress respecto del de redmine
+`values.yaml` que representan a un Application determinado. Debido que este
+archivo puede tener datos sensibles, se recomienda (como se muestra en este
+ejemplo) utilizar encripción del archivo usando helm secrets.
 
 ### Las aplicaciones del chart
 
