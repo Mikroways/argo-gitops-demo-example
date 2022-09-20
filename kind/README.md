@@ -44,7 +44,7 @@ pubic key:
 age193tt38de3fzuujax2krt450mfpaf25zc957h6qp7nrp2uxzj3apsywa3sz
 ```
 
-Por ejemplo, bajo el directorio [`proyectos/`](../proyectos) se define esta
+Por ejemplo, bajo el directorio [`projects/`](../projects) se define esta
 clave como recipiente de AGE. La clave privada está encriptada a su vez con sops
 pero con kms
 
