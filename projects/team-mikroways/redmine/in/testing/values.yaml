@@ -31,32 +31,12 @@ argo-project:
 
     applicationRequirements:
       enabled: true
-      repoURL: https://charts.bitnami.com/bitnami
-      targetRevision: 11.3.x
-      chart: mariadb
+      repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/redmine-deploy-testing.git
+      targetRevision: HEAD
+      path: reqs/
       helm:
-        values: |
-          fullnameOverride: wp-db
-          architecture: standalone
-          auth:
-            rootPassword: supersecret
-            database: redmine
-            username: redmine
-            password: pass
-          primary:
-            resources:
-              limits:
-                cpu: 100m
-                memory: 256Mi
-              requests:
-                cpu: 100m
-                memory: 256Mi
-            persistence:
-              enabled: true
-              storageClass: ""
-              accessModes:
-                - ReadWriteOnce
-              size: 1Gi
+        valueFiles:
+          - secrets+age-import-kubernetes://argocd/helm-secrets-age-private-key#key.txt?values-secret.yaml
       syncPolicy:
         automated: {}
 
@@ -64,6 +44,10 @@ argo-project:
       enabled: true
       repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/redmine-deploy-testing.git
       targetRevision: HEAD
-      path: .
+      path: redmine/
+      helm:
+        valueFiles:
+          - secrets+age-import-kubernetes://argocd/helm-secrets-age-private-key#key.txt?values-secret.yaml
+          - values-version.yaml
       syncPolicy:
         automated: {}
