@@ -27,6 +27,14 @@ La instalación de argocd, utiliza helm secrets con una clave KMS de mikroways
 que garantiza que argocd configure un repositorio que pueda acceder a descargar
 el chart de helm.
 
+## Recrear el cluster
+
+Es posible destruir, crear e inicializar el cluster en un comando
+
+```
+kind delete cluster && kind create cluster && helmfile --no-color apply 
+```
+
 ## Helm secrets
 
 Los secretos que desencripta ArgoCD podrán encriptarse con las siguiente age
