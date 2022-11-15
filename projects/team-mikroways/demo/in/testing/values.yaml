@@ -1,39 +1,39 @@
 argo-project:
-    argo:
-        readOnlyGroups:
-            - grupo-ro
-        adminGroups:
-            - grupo-admin
-        baseApplication:
-            helm:
-                values: |
-                    quota:
-                      requests:
-                        cpu: '1'
-                        memory: 2Gi
-                      limits:
-                        cpu: '2'
-                        memory: 4Gi
-                      pods: "5"
-                      persistentvolumeclaims: "3"
-                      resourcequotas: "1"
-                      services: "5"
+  argo:
+    readOnlyGroups:
+      - grupo-ro
+    adminGroups:
+      - grupo-admin
+    baseApplication:
+      helm:
+        values: |
+          quota:
+            requests:
+              cpu: '1'
+              memory: 2Gi
+            limits:
+              cpu: '2'
+              memory: 4Gi
+            pods: "5"
+            persistentvolumeclaims: "3"
+            resourcequotas: "1"
+            services: "5"
 
-                    limits:
-                      default:
-                        cpu: 200m
-                        memory: 512Mi
-                      defaultRequest:
-                        cpu: 100m
-                        memory: 256Mi
-                      type: Container
-        application:
-            enabled: true
-            repoURL: https://github.com/juanpsm/demo-kcd.git
-            targetRevision: HEAD
-            path: redmine/
-            helm:
-                valueFiles:
-                    - values.yaml
-            syncPolicy:
-                automated: {}
+          limits:
+            default:
+              cpu: 200m
+              memory: 512Mi
+            defaultRequest:
+              cpu: 100m
+              memory: 256Mi
+            type: Container
+    application:
+      enabled: true
+      repoURL: https://github.com/juanpsm/demo-kcd.git
+      targetRevision: HEAD
+      path: .
+      helm:
+        valueFiles:
+          - values.yaml
+      syncPolicy:
+        automated: {}
