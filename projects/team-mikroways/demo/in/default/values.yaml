@@ -33,14 +33,7 @@ argo-project:
       targetRevision: HEAD
       path: .
       helm:
-        values: |
-          <html>
-            <head>
-              <title>testing</title>
-            </head>
-            <body>
-              <h1>Testing environment</h1>
-              <p> Hello </p>
-            </body>
+        valueFiles:
+          - values.yaml
       syncPolicy:
         automated: {}

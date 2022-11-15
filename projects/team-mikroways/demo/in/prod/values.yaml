@@ -36,10 +36,10 @@ argo-project:
         values: |
           <html>
             <head>
-              <title>testing</title>
+              <title>prod</title>
             </head>
             <body>
-              <h1>Testing environment</h1>
+              <h1>Production environment</h1>
               <p> Hello </p>
             </body>
       syncPolicy:
