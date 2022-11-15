@@ -34,13 +34,16 @@ argo-project:
       path: .
       helm:
         values: |
-          <html>
-            <head>
-              <title>testing</title>
-            </head>
-            <body>
-              <h1>Testing environment</h1>
-              <p> Hello </p>
-            </body>
+          serve-static:
+            html: |
+              <html>
+                <head>
+                  <title>testing</title>
+                </head>
+                <body>
+                  <h1>Testing environment</h1>
+                  <p>Hello</p>
+                </body>
+              </html>
       syncPolicy:
         automated: {}
