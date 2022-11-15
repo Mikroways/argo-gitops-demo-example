@@ -6,7 +6,7 @@ spec:
   generators:
     - git:
         repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/argo-gitops-demo-example.git
-        revision: HEAD
+        revision: demo-kcd
         files:
             - path: projects/**/values.yaml
   template:
@@ -21,7 +21,7 @@ spec:
       source:
         path: charts/custom-argo-project
         repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/argo-gitops-demo-example.git
-        targetRevision: HEAD
+        targetRevision: demo-kcd
         helm:
           values: |
             argo-project:

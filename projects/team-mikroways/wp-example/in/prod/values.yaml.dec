@@ -1,0 +1,86 @@
+argo-project:
+    argo:
+        readOnlyGroups:
+            - grupo-ro-01
+            - grupo-ro-02
+        adminGroups:
+            - grupo-admin-01
+        baseApplication:
+            helm:
+                values: |
+                    quota:
+                      requests:
+                        cpu: '2'
+                        memory: 6Gi
+                      limits:
+                        cpu: '4'
+                        memory: 8Gi
+                      pods: "10"
+                      persistentvolumeclaims: "5"
+                      resourcequotas: "1"
+                      services: "5"
+
+                    limits:
+                      default:
+                        cpu: 200m
+                        memory: 512Mi
+                      defaultRequest:
+                        cpu: 100m
+                        memory: 256Mi
+                      type: Container
+        applicationRequirements:
+            enabled: true
+            repoURL: https://charts.bitnami.com/bitnami
+            targetRevision: 11.3.x
+            chart: mariadb
+            helm:
+                values: |
+                    fullnameOverride: wp-db
+                    architecture: standalone
+                    auth:
+                      rootPassword: rootpass123
+                      database: wordpress
+                      username: wpuser
+                      password: wppass
+                    primary:
+                      resources:
+                        limits:
+                          cpu: 500m
+                          memory: 256Mi
+                        requests:
+                          cpu: 500m
+                          memory: 256Mi
+                      persistence:
+                        enabled: true
+                        storageClass: ""
+                        accessModes:
+                          - ReadWriteOnce
+                        size: 1Gi
+            syncPolicy:
+                automated: {}
+        application:
+            enabled: true
+            repoURL: https://charts.bitnami.com/bitnami
+            targetRevision: 15.2.x
+            chart: wordpress
+            helm:
+                values: |
+                    mariadb:
+                      enabled: false
+                    service:
+                      type: ClusterIP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 500m
+                        memory: 256Mi
+                    externalDatabase:
+                      host: wp-db
+                      port: 3306
+                      user: wpuser
+                      password: wppass
+                      database: wordpress
+            syncPolicy:
+                automated: {}
