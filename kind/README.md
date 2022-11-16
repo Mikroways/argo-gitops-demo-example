@@ -10,13 +10,13 @@ En este mismo directorio, proveemos un `.envrc` que setea la variable
 
 Procedemos entonces a crear un cluster kind:
 
-```
+```bash
 kind create cluster
 ```
 
 Luego, instalamos las herramientas necesarias con helmfile:
 
-```
+```bash
 helmfile --no-color apply
 ```
 
@@ -31,7 +31,7 @@ el chart de helm.
 
 Es posible destruir, crear e inicializar el cluster en un comando
 
-```
+```bash
 kind delete cluster && kind create cluster && helmfile --no-color apply 
 ```
 
@@ -40,12 +40,10 @@ kind delete cluster && kind create cluster && helmfile --no-color apply
 Los secretos que desencripta ArgoCD podrán encriptarse con las siguiente age
 pubic key:
 
-```
+```bash
 age193tt38de3fzuujax2krt450mfpaf25zc957h6qp7nrp2uxzj3apsywa3sz
 ```
 
 Por ejemplo, bajo el directorio [`projects/`](../projects) se define esta
 clave como recipiente de AGE. La clave privada está encriptada a su vez con sops
 pero con kms
-
-

@@ -48,7 +48,7 @@ exista un repositorio en argocd con la URL completa a la registry.
   entonces creando un repositorio en argo con el siguiente formato será
   suficiente:
 
-```
+```bash
 url: registry.gitlab.com/mikroways
 name: xxxx
 type: helm
@@ -64,9 +64,9 @@ password: pass
   llama `argo-base-app`. En este caso, no alcanza con el anterior repositorio en
   ArgoCD. Argo buscará un poresitorio con la URL completa. Por ello, a pesar de
   existir un repositorio como el indicado anteriormente, se debe crear uno como se
-  explica a continuación: 
+  explica a continuación:
 
-```
+```bash
 url: registry.gitlab.com/mikroways/k8s/charts/gitops/argo-base-app
 name: xxxx
 type: helm
@@ -89,7 +89,7 @@ escenarios que hemos visto repetirse en diferentes clientes:
 ### Organismos con equipos por producto
 
 En este escenario, tenemos múltiples equipos de desarrolladores, cada uno
-gestiona múltiples aplicaciones. Esas aplicaciones se desplegarán de a _grupos 
+gestiona múltiples aplicaciones. Esas aplicaciones se desplegarán de a _grupos
 de ellas mismas_, llamando a éstos grupos **proyectos**. Entonces, un proyecto
 corresponde a un equipo, y desplegará varias aplicaciones que desarrolla ese
 mismo equipo. Entonces, un proyecto debe tener varios ambientes (prod, qa, dev,
@@ -139,13 +139,13 @@ ambiente determinado. Además define tres aplicaciones que se crean en el orden
 en que se mencionan a continuación:
 
 * **Aplicación base:** crea el namespace donde se desplegarán las siguientes
-  aplicaciones. De esta forma, preapara LimitRange y ResourceQuota,
+  aplicaciones. De esta forma, prepara LimitRange y ResourceQuota,
   NetworkPolicies y así podríamos agregar más restricciones que asegurarán tener
   ambientes controlados.
 * **Aplicación de requerimientos:** permite antes de desplegar la aplicación,
   crear todos los recursos que sean necesarios. Por ejemplo bases de datos.
   _Esta aplicación es opcional_.
-* **Aplicación en sí:** la aplicaicón que desencadenará el despliegue completo
+* **Aplicación en sí:** la aplicación que desencadenará el despliegue completo
   de aquellas aplicaciones que define un equipo determinado. _Esta aplicación es
   opcional_.
 
