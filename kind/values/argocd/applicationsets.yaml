@@ -5,7 +5,7 @@ metadata:
 spec:
   generators:
     - git:
-        repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/argo-gitops-demo-example.git
+        repoURL: https://github.com/Mikroways/argo-gitops-demo-example.git
         revision: demo-kcd
         files:
             - path: projects/**/values.yaml
@@ -20,7 +20,7 @@ spec:
       project: default
       source:
         path: charts/custom-argo-project
-        repoURL: https://gitlab.com/mikroways/k8s/charts/gitops/argo-gitops-demo-example.git
+        repoURL: https://github.com/Mikroways/argo-gitops-demo-example.git
         targetRevision: demo-kcd
         helm:
           values: |
