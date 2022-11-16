@@ -6,7 +6,7 @@ spec:
   generators:
     - git:
         repoURL: https://github.com/Mikroways/argo-gitops-demo-example.git
-        revision: demo-kcd
+        revision: demo-kcd-with-ingress
         files:
             - path: projects/**/values.yaml
   template:
@@ -21,7 +21,7 @@ spec:
       source:
         path: charts/custom-argo-project
         repoURL: https://github.com/Mikroways/argo-gitops-demo-example.git
-        targetRevision: demo-kcd
+        targetRevision: demo-kcd-with-ingress
         helm:
           values: |
             argo-project:
