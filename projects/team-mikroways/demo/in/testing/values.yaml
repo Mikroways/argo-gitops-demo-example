@@ -60,7 +60,7 @@ argo-project:
 
                     <main role="main" class="inner cover">
                       <h1 class="cover-heading">Testing</h1>
-                      <p class="lead">Example app using </p>
+                      <p class="lead">Example app deployed using gitops</p>
                     </main>
                   
                     <footer class="mastfoot mt-auto">
