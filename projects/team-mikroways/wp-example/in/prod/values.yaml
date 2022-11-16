@@ -1,0 +1,43 @@
+argo-project:
+    argo:
+        readOnlyGroups:
+            - ENC[AES256_GCM,data:eNL+6ify6oULlyw=,iv:NsYYMLygoyWxFR6ItubGapCQ8FCpLLRsagDLmq7T/Eo=,tag:juCU/n16hrE2NP7rKLN6WA==,type:str]
+            - ENC[AES256_GCM,data:OnqOyqqd52bH7uw=,iv:ZKSKvXbNX2eYFhkPSPCbSP1i1ajlhleaRaYLFZ5WHcw=,tag:3+EITMiJFwXZrvh960Zorw==,type:str]
+        adminGroups:
+            - ENC[AES256_GCM,data:OP3M7WpUGqk5vQDX2lY=,iv:kIx1a61EAFWPgHJqk348XJQsZ1VxfNYbYEcZjx43yus=,tag:5XC5LLF9BESdpRlFKkqZzQ==,type:str]
+        baseApplication:
+            helm:
+                values: ENC[AES256_GCM,data:y0/a8/QzMsCVT/FJsERkrZq8DFrRT1kJVW6UQYQqGDFE0TBeJUQbTNgVWJqNzLt2JzhtiDNRD8EI+MRjsVWH5kBfS8lte3nL6O/8ULRWiUHUpEaOLppP5zmFgL4wShhO0Pa7u6Jm4eho9wbJ6jc993FxWV58lxU/J4myj2h4ucIkL5AHpumAY0gwXejHhKf3D/3qXEZZvU5GWiC6CgqKWqq76DCDRkvoyfH4z7htQUpOhYjS0pfH/oR8OOgrQCo2cXBOZ1xO0LE3BhpVdJHHhCMIBInHB8bc3cuI8+OTcbFXhtV6rxPAM29PIA2+rCHqKIhk0nv3ULrGqoVeUy20gkPPsusOnR0DtY9d8njm53bYijleB2CIu3CjLwcmqWDt,iv:QLLixcGusb7FeQm0qRfFedtlOZNQmQ4lOGjylZBrsCc=,tag:S/h6O+ElE2XsU9Gm3B4LKg==,type:str]
+        applicationRequirements:
+            enabled: ENC[AES256_GCM,data:BBxtww==,iv:czrgZz5AoWMGt7vB15XiK6pahPCmG3cJmAtARK4vkzU=,tag:1xAwLv5cuGSpqYE63jX2Cg==,type:bool]
+            repoURL: ENC[AES256_GCM,data:MVLH3ip+0U85xXE6RvCNJV5Ilnp9S55phP658dnHvSEZ7w==,iv:wqwFZimUf6iTLE20dAw49Ewr/dg8mHDCO/eIvxkfLMU=,tag:u+sheeCVPCDcObsPs03C5A==,type:str]
+            targetRevision: ENC[AES256_GCM,data:AIEBPpqN,iv:9RgFD2eNf8hztPRdMvRxnMYjXAhiJhS5mhcPy8svseA=,tag:suUD50ytLq02p6sqSQRI3Q==,type:str]
+            chart: ENC[AES256_GCM,data:3C+LuOvMaA==,iv:lnQWMXnLrq5yxSq4IuICsQUtpaJxdL36IVjI0kxDmAI=,tag:5kSo7Bo6HmN9LE2i1MK7MA==,type:str]
+            helm:
+                values: ENC[AES256_GCM,data:Og0Bxp90cOTNcL7aM6DvT1Nl6m7r+P+DI8eqasIsAP/qJhC6HFOMSiMQ3+ByfH/NSbxKQJG1e4BIjgG+XN1YjUPtpFpfOYzWBxK4WDgDkf6CAkt+YO2KzBLbXkkaoGvksbneom7WRgqqUxeA4aVy2ki8NoLKY/RwtBvDxJEAZ4vToZ8pdTFrUGzczVhQ/KbVnG6ofpFZ3XIpbiGFv8BuCUsuSqMLhlPRuQhTucLfKE9NOSij0+UDbqgfUTNJOPWUzrNI31aWw/B9S00NE2zcNz3HXbTy6ee51Lrjb8PEaLDaB8wzggbn1jWjnihiCdc3vzfCTskI8e0DbGW7KQJOkkF3ctEwrKb46wWzdSdOrqnReUhKcuNWAPxs/+FjzpbbWiShEDnJoRQIW1ObVEH8Q5kq+58/fUsyb1u+eSMwOnXmM3lZ/uQVByVEbKgrV9JygXB8qNCRG8UbL1zWCdFBQx+wGsasorzCraQyKDQY32xx+w==,iv:2X0yW3MXwp9y5zV6u+0clKeP3w33fQA6CC2AHyIu3Nk=,tag:Q/YgI6PiCLXt2LSDAS6nIQ==,type:str]
+            syncPolicy:
+                automated: {}
+        application:
+            enabled: ENC[AES256_GCM,data:0Ne/vg==,iv:3r/ex8Viq222+J3CQI+3HwMQIXLyUkmR2GHLQTOwZD8=,tag:KyD762k5gSr6c3ylkgN2Ag==,type:bool]
+            repoURL: ENC[AES256_GCM,data:9E9YEgt61zjZZ3+Ejh4wgSY1Vxzs4Yyj+y7kyGUe5za7tw==,iv:Nx4DQUZuK61sZo5RAITDFIPYBweYs7V2byruAJnDUU8=,tag:uD+oaqWF4XhZxr1Z5Ayc+A==,type:str]
+            targetRevision: ENC[AES256_GCM,data:dr5F5Ji1,iv:fRBm+MXNWFz6b0ILq3txNuUx2WMditUqY/Yq/NqzQXI=,tag:1do2F2sncREi8iZe0vYfOA==,type:str]
+            chart: ENC[AES256_GCM,data:zt0unwBD0fPW,iv:gKQxAkRywGVMU1IU47mcN3xFgZr9X5CVxNeQhKkPWn8=,tag:Qj4HrLsL3iIiK6COjA5jrg==,type:str]
+            helm:
+                values: ENC[AES256_GCM,data:ssNv5CrZDYMW0OSAdTpH2x+HrQxg4UqaG+iIibxjxRH9AKr4pNI2gL2GAM39GT3YhJqhfxSvxLicowBNWYp2KzH75ujHv7u3jj1bOXtUTiTv1/9+FrV/cvy5sLdseQ49Oz/AlA38mGEwlgQ9UGBlYeVdfvqh+x2wUAC9g+OeeQtekcpFcJ22oRZF+eoThfojUf7Ds4nH1tXcbk6r7yk6UU9hCRLqw/aWIhvHbgJnIfuprweDj6UWOSNn1ntdsUWji7nR89vwKOBwefyBGPdhzoW0g+XRLngIiDcQ52yyWrt01iPSra7vo+gu9hlovzSG3Mo+snuCWXzexFLbOyFd+Iogk6b6V2FlhKZvp0biUShdeI7gYUY+GBsabVAkQN1q1zkwlYxDjx7kW3IUNu/brg==,iv:PeYnpQQXdoaao/5/m9bY/pBHIplanhVO+kesGL1HuZw=,tag:vpLp4uVfG7cXlRaDrzSBfg==,type:str]
+            syncPolicy:
+                automated: {}
+sops:
+    kms:
+        - arn: arn:aws:kms:us-east-1:162262765230:key/68099981-57be-4f94-b31b-c792651bef17
+          created_at: "2022-11-16T06:39:43Z"
+          enc: AQICAHjr0eqZa81T/RokrZV01svqIl8crnLjkEYmtyeMcm4FwAHvK+q6MGxnbtk+1o3OoSxkAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMbVlnwk7weALskd2IAgEQgDvLDBfSH7BIeyKHD+100sbeCVqH2bqAJhxB1dvS77fb8/PE8RYhwAEnJBjGRNj22xWPQTy1i4H6KyKsfg==
+          aws_profile: ""
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age: []
+    lastmodified: "2022-11-16T06:39:43Z"
+    mac: ENC[AES256_GCM,data:2bcSGIe78V6HtCin50HufC5Wm34dCuFhsv9eG35Ine9ARv34YZobURsSUxEfmse/+1ZCSZ4wBDP9+H2Lct+GtWyrvZx3/pUAZ0o/ALcD1FdMAUuywxgvjhiwjnntFYo8Zc3ysZCo8y1oFoQlIhiGqsug58NBXHz9LsZK26SwYE8=,iv:b7UHW78Kx81Gj/L2vm3ypnLhmB/sat3/p92yn91ItUc=,tag:rWeMEBh/RGady8tw+Zc+Zg==,type:str]
+    pgp: []
+    unencrypted_suffix: _unencrypted
+    version: 3.7.1
