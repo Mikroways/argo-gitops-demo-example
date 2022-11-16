@@ -36,13 +36,39 @@ argo-project:
         values: |
           serve-static:
             html: |
-              <html>
+              <!doctype html>
+              <html lang="en">
                 <head>
-                  <title>prod</title>
+                  <!-- Required meta tags -->
+                  <meta charset="utf-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                  <!-- Bootstrap CSS -->
+                  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+                  <link rel="stylesheet" href="https://getbootstrap.com/docs/4.4/examples/cover/cover.css" crossorigin="anonymous" />
+                  <title>Production</title>
                 </head>
-                <body>
-                  <h1>Production environment</h1>
-                  <p>Hello</p>
+                <body class="text-center">
+                  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+                    <header class="masthead mb-auto">
+                      <div class="inner">
+                        <h3 class="masthead-brand">ExampleApp</h3>
+                        <nav class="nav nav-masthead justify-content-center">
+                          <a class="nav-link active" href="#">Home</a>
+                        </nav>
+                      </div>
+                    </header>
+
+                    <main role="main" class="inner cover">
+                      <h1 class="cover-heading">Production</h1>
+                      <p class="lead">Example app using </p>
+                    </main>
+                  
+                    <footer class="mastfoot mt-auto">
+                      <div class="inner">
+                        <p>Cover template for <a href="https://getbootstrap.com/">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+                      </div>
+                    </footer>
+                  </div>
                 </body>
               </html>
       syncPolicy:
