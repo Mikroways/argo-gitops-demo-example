@@ -11,8 +11,12 @@ En este mismo directorio, proveemos un `.envrc` que setea la variable
 Procedemos entonces a crear un cluster kind:
 
 ```bash
-kind create cluster
+kind create cluster cluster --config .kind/config.yaml
 ```
+
+> Crea el cluster con la configuración provista (que agrega labels al control
+> plane para correr el ingress controller en ese nodo). Es lo que [epecifica
+> kind en el sitio oficial](https://kind.sigs.k8s.io/docs/user/ingress/).
 
 Luego, instalamos las herramientas necesarias con helmfile:
 
