@@ -1,0 +1,6 @@
+en ejemplo con kind:
+* Eliminar kms
+* Ejemplioficar y documentar cómo usar sops age para el caso de crear el secret
+  con la clave age. Sugerir que acá sería mejor usar una clave diferente,
+  incluso kms
+* En el appset del ejemplo, verificar la rama a usar

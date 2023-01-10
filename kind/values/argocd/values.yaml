@@ -6,8 +6,10 @@ applicationSet:
   args:
     policy: create-update
 
-server:
-  config:
+configs:
+  params:
+    server.insecure: true
+  cm:
     exec.enabled: "true"
     helm.valuesFileSchemes: >-
       secrets+gpg-import, secrets+gpg-import-kubernetes,
@@ -17,16 +19,13 @@ server:
 
   extraArgs:
     - --insecure
-    - --rootpath=/argocd
+
+server:
   ingress:
     enabled: true
     ingressClassName: nginx
-    paths:
-      - /argocd
-configs:
-  secret:
-    # admin password is mikroways
-    argocdServerAdminPassword: $2a$10$dsTwvxtgWugKmwV8cS9XuuBtDjUFnjI1/lKADNPx.ahujPnK1YWLe
+    hosts:
+      - argocd.gitops.localhost
 
 repoServer:
   serviceAccount:
@@ -72,11 +71,11 @@ repoServer:
       command: [sh, -ec]
       env:
         - name: HELM_SECRETS_VERSION
-          value: "3.12.0"
+          value: "4.2.2"
         - name: KUBECTL_VERSION
-          value: "1.24.3"
+          value: "1.24.9"
         - name: VALS_VERSION
-          value: "0.18.0"
+          value: "0.21.0"
         - name: SOPS_VERSION
           value: "3.7.3"
       args:

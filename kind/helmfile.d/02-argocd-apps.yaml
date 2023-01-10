@@ -1,0 +1,17 @@
+releases:
+- name: argocd-apps
+  namespace: argocd
+  chart: argocd/argocd-apps
+  version: 0.0.*
+  values:
+    - ../values/argocd-apps/values.yaml
+  hooks:
+    - events:
+        - "postsync"
+      showlogs: true
+      command: sh
+      args:
+        - -c
+        - sops -d ../values/argocd-apps/helm-age-secret.yaml |
+          kubectl --namespace '{{`{{ .Release.Namespace }}`}}'
+          apply -f -

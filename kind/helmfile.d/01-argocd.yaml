@@ -1,0 +1,12 @@
+repositories:
+  - name: argocd
+    url: https://argoproj.github.io/argo-helm
+releases:
+- name: argocd
+  namespace: argocd
+  chart: argocd/argo-cd
+  version: 5.16.*
+  values:
+    - ../values/argocd/values.yaml
+  secrets:
+    - ../values/argocd/secrets.yaml

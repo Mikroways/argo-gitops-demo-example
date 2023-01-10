@@ -1,0 +1,43 @@
+applicationsets:
+  - name: equipos-por-producto
+    #    namespace: other-namespace
+    generators:
+      - git:
+          repoURL: https://github.com/Mikroways/argo-gitops-demo-example.git
+          revision: demo-kcd-with-ingress
+          files:
+              - path: projects/**/values.yaml
+    template:
+      metadata:
+        name: '{{path[1]}}-{{path[2]}}-{{path[3]}}-{{path[4]}}'
+      spec:
+        syncPolicy:
+          automated:
+            prune: false
+            selfHeal: true
+        project: default
+        source:
+          path: charts/custom-argo-project
+          repoURL: https://github.com/Mikroways/argo-gitops-demo-example.git
+          targetRevision: demo-kcd-with-ingress
+          helm:
+            values: |
+              argo-project:
+                namespace: '{{path[1]}}-{{path[2]}}-{{path[4]}}'
+                cluster:
+                  name: '{{ path[3] }}'
+                  nameSuffix: 'cluster'
+                argo:
+                  namespace: argocd
+                  baseApplication:
+                    helm:
+                      parameters:
+                        - name: namespace
+                          value: '{{path[1]}}-{{path[2]}}-{{path[4]}}'
+                    syncPolicy:
+                      automated: {}
+            valueFiles:
+              - secrets+age-import-kubernetes://argocd/helm-secrets-age-private-key#key.txt?../../{{path}}/values.yaml
+        destination:
+          server: https://kubernetes.default.svc
+          namespace: default
