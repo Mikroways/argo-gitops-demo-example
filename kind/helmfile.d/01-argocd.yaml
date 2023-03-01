@@ -5,8 +5,8 @@ releases:
 - name: argocd
   namespace: argocd
   chart: argocd/argo-cd
-  version: 5.16.*
+  version: 5.23.*
   values:
-    - ../values/argocd/values.yaml
+    - values/argocd/values.yaml
   secrets:
-    - ../values/argocd/secrets.yaml
+    - values/argocd/secrets.yaml

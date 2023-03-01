@@ -71,11 +71,11 @@ repoServer:
       command: [sh, -ec]
       env:
         - name: HELM_SECRETS_VERSION
-          value: "4.2.2"
+          value: "4.3.0"
         - name: KUBECTL_VERSION
           value: "1.24.9"
         - name: VALS_VERSION
-          value: "0.21.0"
+          value: "0.22.0"
         - name: SOPS_VERSION
           value: "3.7.3"
       args:

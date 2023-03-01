@@ -6,5 +6,5 @@ version: 0.1.0
 appVersion: "1.16.0"
 dependencies:
   - name: argo-project
-    repository: oci://registry.gitlab.com/mikroways/k8s/charts/gitops/argo-project
+    repository: https://mikroways.github.io/argo-gitops-flow
     version: 1.0.*

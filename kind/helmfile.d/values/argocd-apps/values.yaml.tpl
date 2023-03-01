@@ -1,10 +1,9 @@
 applicationsets:
   - name: equipos-por-producto
-    #    namespace: other-namespace
     generators:
       - git:
-          repoURL: https://github.com/Mikroways/argo-gitops-demo-example.git
-          revision: demo-kcd-with-ingress
+          repoURL: $GH_REPO_URL
+          revision: $GH_REVISION
           files:
               - path: projects/**/values.yaml
     template:
@@ -18,8 +17,8 @@ applicationsets:
         project: default
         source:
           path: charts/custom-argo-project
-          repoURL: https://github.com/Mikroways/argo-gitops-demo-example.git
-          targetRevision: demo-kcd-with-ingress
+          repoURL: $GH_REPO_URL
+          targetRevision: $GH_REVISION
           helm:
             values: |
               argo-project:
