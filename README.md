@@ -25,7 +25,7 @@ el de cifrar datos sensibles.
   crear un cluster kind (algo que en un ambiente real no será necesario), debe
   **contener un chart que depende** del chart que da
   [origen al flujo](https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-project).
-  En general la carpeta `kind/` no debería estar presente en ámbitos
+  En general la carpeta [`kind/`](./kind) no debería estar presente en ámbitos
   productivos.
   * La razón de por qué este repositorio mantiene un chart y una serie de
     directorios para cada equipo, se debe al flujo inherentemente GitOps. Por
@@ -53,7 +53,7 @@ el de cifrar datos sensibles.
 
 [Crear un **repositorio privado** a partir del actual repositorio template](https://github.com/Mikroways/argo-gitops-demo-example/generate),
 siguiendo las instrucciones sobre el ejemplo propuesto explicado en la
-documentación bajo la carpet [`kind/`](./kind).
+documentación bajo la carpeta [`kind/`](./kind).
 
 # El chart en este repositorio
 
