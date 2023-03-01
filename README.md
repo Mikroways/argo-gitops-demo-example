@@ -4,11 +4,12 @@ Este repositorio nos permite entender el flujo que proponemos desde Mikroways
 para la gestión de despliegues basada en gitops.
 
 Hemos dispuesto a este repositorio como [template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository)
-para que puedas **replicarlo con tu usuario u organización** de forma completa,
-simulando un ambiente real. Es fundamental que trabajes en un **repositorio
-privado** durante esta demo. De esta forma podrás comprobar que cada
-configuración aquí descripta funciona con tus propias credenciales. Y de paso
-se aplica uno de los patrones propuestos de cifrar claves.
+para que puedas **replicar las pruebas con tu usuario u organización** de forma
+completa, simulando un ambiente real. Es fundamental que trabajes en un
+**repositorio privado** durante tus pruebas. De esta forma podrás comprobar que
+cada configuración aquí descripta funciona con tus propias credenciales. Y de
+paso se aplican buenas prácticas de seguridad y uno de los patrones propuestos,
+el de cifrar datos sensibles.
 
 ## Principios
 
@@ -17,69 +18,65 @@ se aplica uno de los patrones propuestos de cifrar claves.
   del cluster k8s.
 
   >  Los despliegues de servicios de base, como ser CSI, ingress controllers,
-  >  monitoreo y demás, se recomienda no manejarlos con ArgoCD. No al menos en
-  >  este contexto del flujo descripto.
+  >  monitoreo y demás, se recomienda no manejarlos con ArgoCD. No al menos con
+  >  el marco aquí descripto.
 
 * Este repositorio, más allá de mantener la documentación y ejemplos de cómo
   crear un cluster kind (algo que en un ambiente real no será necesario), debe
   **contener un chart que depende** del chart que da
-  [origen al flujo](https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-project). 
-* La razón de la dependencia mencionada en el punto anterior se debe a que el
-  flujo sea GitOps desde su concepción. Por ello, necesitamos versionar los
-  values del chart el mismo repositorio, para poder justamente crear
-  aplicaciones con [`valueFiles`](https://argo-cd.readthedocs.io/en/stable/user-guide/helm/#values-files)
-  relativos.
-* Para dar vida al chart anterior usaremos [ApplicationSets](https://argocd-applicationset.readthedocs.io/en/stable/)
-  con el fin de poder generar aplicaciones cuando se encuentren archivos dentro
-  de una carpeta específica de este mismo repositorio.
-  * Los archivos no pueden estar vacíos para que sean considerados.
-* Solamente los cluster admins podrán modificar este repositorio, creando de
-  esta forma nuevos ambientes.
-* Si bien la idea es la de automatizar y generar la menor cantidad de errores
-  por tareas repetibles, queremos que su uso nos oferzca:
+  [origen al flujo](https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-project).
+  En general la carpeta `kind/` no debería estar presente en ámbitos
+  productivos.
+  * La razón de por qué este repositorio mantiene un chart y una serie de
+    directorios para cada equipo, se debe al flujo inherentemente GitOps. Por
+    ello, necesitamos versionar los values del chart en el mismo repositorio,
+    para poder justamente crear aplicaciones con [`valueFiles`](https://argo-cd.readthedocs.io/en/stable/user-guide/helm/#values-files)
+    relativos.
+  * Para dar vida al chart en este repositorio usaremos [ApplicationSets](https://argocd-applicationset.readthedocs.io/en/stable/)
+    con el fin de poder generar aplicaciones cuando se encuentren nuevos
+    contenidos dentro de una carpeta específica de este mismo repositorio.
+
+    >  Los archivos no pueden estar vacíos para que sean considerados.
+
+* Proponemos que únicamente los cluster admins mantengan este repositorio, siendo
+  su responsabilidad la creación de nuevos ambientes, asignando ResourceQuotas y
+  de esta forma teniendo el control final de qué pude realizar cada equipo.
+* Si bien la idea del marco de trabajo es la de automatizar y minimizar la
+  cantidad de errores por tareas repetibles, queremos maximizar:
   * Simplicidad en el uso.
-  * Probar nuevas funcionalides en un despliegue específico sin afectar al resto
-  * Poder aplicar cambios masivos con el menor esfuerzo posible
+  * Permitir realizar pruebas de nuevas funcionalides en un despliegue específico
+    sin afectar al resto de los despliegues, desacoplándo cada despliegue de su
+    ambiente.
+  * Aplicar cambios masivamente con un mínimo esfuerzo.
 
 ## Uso del template
 
-Creá un **repositorio privado** a partir de éste template y seguí las
-instrucciones sobre el ejemplo completo usando kind.
-
-# TODO revisar para abajo
-
-# Ejemplo completo usando kind
-
-[kind](https://kind.sigs.k8s.io/) permite instanciar un cluster k8s rápidamente
-usando docker. Ingresar en la carpeta [`kind/`](./kind) y siguiendo las
-instrucciones del readme, podrá tenerse un cluster nuevo con todas las
-herramientas necesarias desplegadas en él. Ese despliegue usará herramientas que
-son requeridas para esta prueba.
+Crear un **repositorio privado** a partir del actual repositorio template,
+siguiendo las instrucciones sobre el ejemplo propuesto explicado en la
+documentación bajo la carpet [`kind/`](./kind).
 
 ## El chart en este repositorio
 
-Analizando el ApplicationSet del escenario [`/kind`](./kind), se podrá
-entender cómo es el generador de ArgoCD Applications y de qué forma se inyectan
-valores a través de `valueFiles:`. Debido que este archivo suele tener datos
-sensibles, se recomienda (como se muestra en este ejemplo) utilizar cifrado del
-archivo usando [helm secrets](https://github.com/jkroepke/helm-secrets), es
-decir, se cifrarán usando [sops](https://github.com/mozilla/sops) y
-[age](https://github.com/FiloSottile/age).
+Analizando el ApplicationSet utilizado en la prueba propuesta en la carpeta
+[`/kind`](./kind), se podrá entender cómo es el [generador de ArgoCD Applications](https://argocd-applicationset.readthedocs.io/en/stable/Generators/)
+y de qué forma se inyectan valores a través de `valueFiles:`. Debido que este
+archivo suele tener datos sensibles, los datos aquí versionados serán
+cifrados y luego versionados con las explicaciones pertinentes que ustedes
+deberán seguir para completar las pruebas.
 
-Las aplicaciones generadas, no representan un despliegue para nuestro flujo,
-sino una implementación del patrón Apps of Apps para crear nuevas aplicaciones
-ArgoCD que nos permiten:
+El chart aquí usado depende de [dos charts públicos](https://github.com/Mikroways/argo-gitops-flow)
+que coniguran los prerequisitos necesarios para implementar este flujo de gitops
+usando el patrón Apps of Apps para crear nuevas aplicaciones ArgoCD
+considerando:
 
-* Crear el ambiente
+* Crear un ambiente para un despliegue
 * Asegurarlo y limitar el uso de recursos
 * Crear imagePullSecrets
 * Desplegar aquellos requerimientos del ambiente
 * Desplegar la aplicación del ambiente
 
-Para ello, el chart en este repositorio, creará en ArgoCD un Proyecto limitando
-qué roles podrán acceder como administradores o sólo lectura a ArgoCD para
-operar con ese ambiente. Además define tres aplicaciones que se crean en el
-orden en que se mencionan a continuación:
+Cada despliegue creará tres aplicaciones ArgoCD con las características
+mencionadas a continuación:
 
 * **Aplicación base:** crea el namespace donde se desplegarán las siguientes
   aplicaciones. De esta forma, prepara LimitRange y ResourceQuota,
@@ -93,6 +90,8 @@ orden en que se mencionan a continuación:
   opcional_.
 
 Si bien las dos últimas son opcionales, la idea es que estén definidas. Sin
-embargo, mientras se crean, muchas veces es conveniente que los desarrolladores
-prueben manualmente los despliegues hasta encontrar un equilibrio que luego
-podrán versionar y sí usar un flujo completo de GitOps como el propuesto.
+embargo, durante el proceso de construcción de los charts correspondientes al
+despliegue de una solución, puede ser útil crear las aplicaciones desde la UI de
+ArgoCD hasta lograr cierta madurez y a partir de ese momento, aplicar el marco
+completo de GitOps utilizando las aplicaciones de requerimientos y la aplicación
+en sí.
