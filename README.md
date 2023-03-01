@@ -49,13 +49,13 @@ el de cifrar datos sensibles.
     ambiente.
   * Aplicar cambios masivamente con un mínimo esfuerzo.
 
-## Uso del template
+# Uso del template
 
-Crear un **repositorio privado** a partir del actual repositorio template,
+[Crear un **repositorio privado** a partir del actual repositorio template](https://github.com/Mikroways/argo-gitops-demo-example/generate),
 siguiendo las instrucciones sobre el ejemplo propuesto explicado en la
 documentación bajo la carpet [`kind/`](./kind).
 
-## El chart en este repositorio
+# El chart en este repositorio
 
 Analizando el ApplicationSet utilizado en la prueba propuesta en la carpeta
 [`/kind`](./kind), se podrá entender cómo es el [generador de ArgoCD Applications](https://argocd-applicationset.readthedocs.io/en/stable/Generators/)
