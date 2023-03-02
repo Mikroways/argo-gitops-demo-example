@@ -5,7 +5,8 @@ aprovisionamos con helmfile.
 
 ## Requerimientos
 
-Para poder completar esta prueba, deben instalarse las siguientes herramientas:
+Para poder completar esta prueba, **deben instalarse las siguientes
+herramientas**:
 
 * [kind](https://kind.sigs.k8s.io/)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
@@ -40,13 +41,6 @@ Por su parte, la variable `SOPS_AGE_KEY_FILE` es usada por sops, y por ende por
 helm-secrets y helmfile para (des)cifrar datos sensibles. Age funciona cifrando
 de forma asimétrica, trabajando de una forma muy similar a las claves ssh.
 Cuando cifremos algo, podremos indicar qué claves públicas age podrán descifrar.
-
-Una vez instladas las aplicaciones anteriores, procederemos a crear los
-directorios donde se guardarán las configuraciones recién mencionadas:
-
-```
-mkdir -p .config .age
-```
 
 ## Creación de un cluster
 
@@ -99,6 +93,7 @@ siguiente comando (asumiento la variable `SOPS_AGE_KEY_FILE` existe y está
 seteada como se mostró anteriormente):
 
 ```
+mkdir -p .age
 age-keygen -o $SOPS_AGE_KEY_FILE
 ```
 > La salida del comando anterior imprime la clave pública y la privada (junto
@@ -109,6 +104,11 @@ Este archivo, **¡¡no debe versionarse!!**. Quien lo posea podrá acceder a las
 credenciales que serán cifradas. Por ello, puede observarse que el `.gitignore`
 justamente ignora todo bajo `.age/` y `.kube/`.
 
+> La clave Age aquí creada será para gestionar los datos sensibles
+> correspondientes a la instalación del cluster kind. O sea que no debe
+> confundirse con otra clave Age que luego mencionaremos para que Argo CD pueda
+> descifrar otros datos.
+
 ### Cifrado de datos sensibles
 
 Para el cifrado de datos usaremos sops. Sops puede cifrar datos usando diversos
@@ -116,25 +116,30 @@ mecanismos entre los que podemos mencionar Age, PGP, KMS, vault.
 
 El archivo con datos sensibles de argocd considerará:
 
-* La contraseña del usuario admin de argocd
-* Un secret usado por helm-secrets para descifrar datos cifrados con una clave
-  age determinada
+* La contraseña del usuario admin de argocd. La contraseña del usuario admin de
+  argocd para esta prueba será **mikroways**, pero puede cambiarse como se
+  explica en [la FAQ de argocd](https://github.com/argoproj/argo-cd/blob/master/docs/faq.md#i-forgot-the-admin-password-how-do-i-reset-it).
+* Un secret usado por helm-secrets que contiene la clave Age privada para
+  descifrar datos desde Argo CD. _Esta clave no es la misma que creamos
+  anteriormente._
 * Credenciales para que Argo CD pueda clonar repositorios git o descargar charts
   de repositorios privados.
 
-La contraseña del usuario admin de argocd será por defecto **mikroways**, pero
-puede cambiarse como se explica en [la FAQ de argocd](https://github.com/argoproj/argo-cd/blob/master/docs/faq.md#i-forgot-the-admin-password-how-do-i-reset-it).
+La clave Age mencionada, no será la misma que creamos en el paso aterior. Será
+otra clave privada que usarán los diferentes equipos que deban desplegar datos
+en Argo CD y cifren aquellos sensibles de forma tal que Argo CD pueda
+descifrarlos. Esto significa que Argo CD mantendrá una clave privada instalada
+en el cluster y compartiremos la correspondiente clave pública para que cada
+equipo de desarrolladores que necesite cifrar datos, pueda hacerlo para más de
+una claves pública:
 
-La clave Age mencionada, no debería ser la misma que usamos para cifrar el
-archivo en custión. Será otra clave privada que será necesaria para que cada
-equipo que desarrolle con datos cifrados, considere la clave pública acá creada.
-Esto significa que Argo CD mantendrá una clave privada instalada en el cluster y
-compartiremos la clave pública asociada para que cada equipo de desarrolladores
-que necesite cifrar datos, pueda hacerlo con varias claves públicas: una
-compartida por el equipo de desarrollo y la de argocd, para que él pueda
-descifrar los datos.
+* Una compartida por el equipo de desarrollo. Quienes posean la privada podrá
+  modificar los datos sensibles.
+* Otra que corresponde a Argo CD. Sólamente Argo CD podrá descifrar estos datos.
 
-Creamos entonces una nueva clave Age:
+
+Creamos entonces una nueva clave Age que usaremos para almacenar como Secret en
+nuestro cluster:
 
 ```
 AGE_KEY=$(age-keygen)
@@ -149,28 +154,30 @@ y procederemos a crear un Github Personal Access Token para darle acceso
 únicamente al token para clonar repositorios. Esto se hace ingresando a [las
 configuraciones de la cuenta, opciones de desarrollo, personal access
 tokens](https://github.com/settings/tokens?type=beta). Crearemos un token que
-únicamente pueda acceder a nuestro flamante repositorio, privado y creado desde
+únicamente pueda acceder a nuestro flamante repositorio privado, creado desde
 nuestro template:
 
 ![GH personal access token](./assets/gh-personal-token.png)
 
 Como muestra el gráfico:
 
-1. Accedemos a la sección de Personal access tokens.
-1. Seleccionamos Fine grained tokens.
-1. Damos un nombre al token.
-1. Ponemos fecha de caducidad del token.
-1. Hacemos que sólo aplique a un subconjunto de repositorios. Esto dependerá de
+1. Accedemos a la sección de **Personal access tokens**.
+1. Seleccionamos **Fine grained tokens**.
+1. Damos un **nombre** al token.
+1. Ponemos **fecha de caducidad** al token.
+1. Hacemos que **sólo aplique a un subconjunto de repositorios**. Esto dependerá de
    cómo se desee trabajar con Github. En este ejemplo elegimos nuestro
    repositorio personal clonado desde el template.
 
 Más abajo, aparecen más opciones de qué permitimos hacer. Seleccionamos
-únicamente **Contents: Read-only**, bajo _Repository Permissions_.
+únicamente **Contents: Read-only**, bajo **Repository Permissions**.
 
 Github nos presentará nuestro token, cuyo formato es bastante extenso parecido
-a **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**.
+a **`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`**.
 Este token debe usarse con nuestro username de github, sólo que al usar esta
 contraseña el acceso será limitado.
+
+> Recordar que el token **caducará en el tiempo configurado**.
 
 
 Procedemos entonces a cifrar el archivo de secretos para argocd. Para
@@ -180,23 +187,30 @@ la siguiente manera:
 ```
 GH_USER=chrodriguez \
   GH_PASSWORD=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 \
-  GH_REPO_URL=https://github.com/chrodriguez/argocd-gitops-demo-example.git \
   AGE_KEY_B64=$(echo $AGE_KEY | base64 -w0) \
-  envsubst '${GH_USER},${GH_PASSWORD},${AGE_KEY_B64},'${GH_REPO_URL}' \
+  envsubst '${GH_USER},${GH_PASSWORD},${AGE_KEY_B64}' \
     < helmfile.d/values/argocd/secrets.yaml.tpl | tee /tmp/secret.yaml
 ```
 
-El comando anterior debería mostrar el template en pantalla con los valores
-reemplazados para las variables `GH_USER`, `GH_PASSWORD`, `GH_REPO_URL` y
-`AGE_KEY_B64`. **Notar que deben usarse los datos propios de su cuenta**. Además
-de imprimirse en pantalla, se guardan en `/tmp/secret.yaml`, gracias al comando
-`tee`.
+> **Notar que se usan datos sensibles propios de su cuenta**.
 
-> El template deja otros ejemplos de cómo dar de alta repositorios o templates
-> de credenciales que quedan como comentarios pero sirven de guía en caso de
-> querer realizar más pruebas.
+El comando anterior debería mostrar el resultado de los reemplazos en pantalla
+con los valores reemplazados para las variables:
 
-El paso final es cifrar la salida del comando anterio usando la clave age [creada
+* **`GH_USER`:** corresponde al username de github
+* **`GH_PASSWORD`:** corresponde al token obtenido en el paso anterior
+* **`AGE_KEY_B64`:** es la clave age privada (y pública como comentario)
+  encodadas como base64.
+
+Además de imprimirse en pantalla (con la idea de controlar si los reemplazos
+fueron correctos), la salida además se guardará en `/tmp/secret.yaml` gracias al
+comando `tee`.
+
+> El archivo generado deja comentadas otras opciones que podrían ser de utilidad
+> en otros escenarios. De esta forma cada quién sabrá como modificar el archivo
+> generado a su gusto.
+
+El paso final es cifrar la salida del comando anterior usando la clave age [creada
 inicialmente](#creación-de-clave-age):
 
 ```
@@ -206,20 +220,22 @@ sops -e \
 ```
 
 > El subcomando detrás de `-a` obtiene la clave pública AGE correspondiente a
-> la clave generada incialmente.
+> la clave generada incialmente. Puede verificarse con la salida del comando
+> `cat $SOPS_AGE_KEY_FILE | grep public | cut -d: -f 2`.
 
-Es para destacar que la clave age que usamos para cifrar este valor, almacena en
-un secret **otra clave age**, la generada y guardada temporalmente en la
-variable `AGE_KEY`. Esta clave privada, que residirá como Secret en el namespace
-de Argo CD, será usada por Argo para poder descifrar cualquier valor. Por tanto
+Destacamos nuevamente que la clave age que usamos para cifrar este valor,
+almacena entre otras cosas, **otra clave age**, la generada y guardada
+temporalmente en la variable `AGE_KEY`. Esta nueva clave privada, que residirá
+como Secret en el namespace de Argo CD, será usada por Argo para poder descifrar
+cualquier valor cifrado por los equipos que realizarán despliegues. Por tanto
 _**no debe confundirse con la clave usada en este repositorio para instalar Argo
-CD**_.
+CD, y demás dependencias**_.
 
-### ApplicationSet con tu repositorio
+### ApplicationSets en tu repositorio
 
-Este paso, utilizará un templae similar al usado con el cifrado de datos que
-realizamos en el paso anterior, pero en este caso para configurar el nombre de
-tu repositorio, este que creaste desde el template.
+Este paso utilizará un script similar al usado con el cifrado de datos que
+acabamos de completar. En este caso será para configurar el nombre de
+tu repositorio en el Application Set:
 
 ```
 GH_REPO_URL=https://github.com/chrodriguez/argocd-gitops-demo-example.git \
@@ -228,10 +244,17 @@ GH_REPO_URL=https://github.com/chrodriguez/argocd-gitops-demo-example.git \
     | tee helmfile.d/values/argocd-apps/values.yaml
 ```
 
-El comando anterior debería mostrar el template en pantalla con los valores
-reemplazados para las variables `GH_USER`, `GH_PASSWORD` y `AGE_KEY_B64`. **Notar
-que deben usarse los datos propios de su cuenta**. Además de imprimirse en
-pantalla, se guardan en `helmfile.d/values/argocd-apps/values.yaml`.
+> **Notar que se usan datos propios de su cuenta**.
+
+El comando anterior debería mostrar el resultado de los reemplazos en pantalla
+con los valores reemplazados para las variables:
+
+* **`GH_REPO_URL`:** la URL del repositorio git. Utilizar https y no ssh.
+* **`GH_REVISION`**: la rama donde se está trabajando. EL valor **main** suele
+  ser el adecuado, salvo que se quiera probar algo en otra rama.
+
+Además de imprimirse en pantalla, el resultado del comando se guardan en
+`helmfile.d/values/argocd-apps/values.yaml`.
 
 ## Instalación de herramientas
 
@@ -241,7 +264,7 @@ las herramientas:
 
 * Argo CD
 * Aplicaciones de Argo CD (crea el application set)
-* Nginx ingress controller
+* [Nginx ingress controller](https://kubernetes.github.io/ingress-nginx/)
 
 Con el siguiente comando, se instalarán las herramientas, además de crear un
 ApplicationSet que dará vida inmediatamente a los despliegues descriptos en este
@@ -256,46 +279,71 @@ helmfile apply
 
 ## Acceso a Argo CD
 
-Hemos instalado Argo CD y configurado además un ingress controller, el de
-[nginx](https://kubernetes.github.io/ingress-nginx/). Para que sea posible
-acceder a las aplicaciones instaladas dentro del cluster, es necesario entender
-que en los Linux modernos, aquellos basados en [systemda](https://systemd.io/),
-el DNS se maneja con
-[systemd-resolved](https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html).
+Hemos instalado Argo CD y configurado además un ingress controller. Para
+acceder a las aplicaciones instaladas dentro del cluster kind, es necesario
+entender que en los Linux modernos, aquellos basados en [systemda](https://systemd.io/),
+el DNS se maneja con [systemd-resolved](https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html).
 Este resolver nos ofrece la posibilidad de contar con que cualquier nombre de
 DNS terminado en `.localhost` o `localhost.localdomain` resuelven a 127.0.0.1 y
-::1. Es así como el DNS empleado en esta demo es argocd.gitops.localhost:
+::1. Es así como el DNS empleado en este ejemplo es **argocd.gitops.localhost**:
 
 ```
 kubectl get ingress -A
 ```
 
+> Debería ser el único ingress existente
+
 Una vez que helmfile finalice de forma correcta, podemos ingresar a nuestro
-flamante Argo CD usando: http://argocd.gitops.localhost.
+Argo CD usando la URL http://argocd.gitops.localhost.
 
 Los datos de acceso serán:
 
 * **Usuario:** admin
-* **Contraseña:** mikroways (salvo que la hayas modificado).
+* **Contraseña:** mikroways (salvo que se haya modificado).
 
 
 ## Recrear el cluster
 
-Es posible destruir, crear e inicializar el cluster en un comando
+Es posible destruir el cluster con
 
 ```bash
-kind delete cluster && kind create cluster && helmfile --no-color apply 
+kind delete cluster
 ```
 
-## Helm secrets
-
-Los secretos que desencripta ArgoCD podrán encriptarse con las siguiente age
-pubic key:
+La recreación será únicamente con los pasos:
 
 ```bash
-age193tt38de3fzuujax2krt450mfpaf25zc957h6qp7nrp2uxzj3apsywa3sz
+kind create cluster --config .kind/config.yaml
+helmfile apply
 ```
 
-Por ejemplo, bajo el directorio [`projects/`](../projects) se define esta
-clave como recipiente de AGE. La clave privada está encriptada a su vez con sops
-pero con kms
+## Obtener la clave Age pública de Argo CD
+
+Como mencionamos en la instalación de Argo, la segunda clave Age creada es para
+que cada equipo de desarrollo trabaje con datos sensibles que Argo CD pueda
+descifrar. Obtendremos la clave con el siguiente comando:
+
+```bash
+kubectl -n argocd get secrets -l component=helm-secrets-age \
+  -o jsonpath='{.items[0].data.key\.txt}' | base64 -d | grep 'public' | cut -d: -f2
+```
+
+El comando debe devolver la clave age pública. Algo como por ejemplo
+`age1ej9q2trpkmnqah3e8y9776ss2yprkvyqlrp78nkx6scqaqc923mqrn0cys`. Esta clave
+debe publicarse explícitamente para que **todos la conozcan y tengan fácil
+acceso a ella**.
+
+Los equipos de desarrollo que necesiten cifrar datos para más de una clave,
+deberán setear la variable de ambiente **`SOPS_AGE_RECIPIENTS`** con varias
+claves públicas separadas por coma. Luego cualquier propietario de alguna de las
+privadas asociadas a esta lista de claves públicas podrá descifrar el dato. Más
+información en [la documentación de
+sops](https://github.com/mozilla/sops#22encrypting-using-age).
+
+## Configurando los despliegues con Application Sets
+
+¡Ya tenemos todas las piezas listas! Solamente nos queda pendiente describir en
+este mismo repositorio, bajo la carpeta `../projects` cada despliegue que
+queremos realizar de forma declarativa y aplicando GitOps de la forma más pura.
+Invitamos a continuar con la lectura de cómo crear ambientes según la
+documentación disponible en [`../projects`](../projects).

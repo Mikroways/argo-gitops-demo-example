@@ -1,1 +1,3 @@
-.age/
+.age
+.kube
+.envrc

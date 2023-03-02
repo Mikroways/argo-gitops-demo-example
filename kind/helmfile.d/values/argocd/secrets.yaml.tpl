@@ -12,8 +12,6 @@ configs:
 #            username: readonly
 #            password: supersecretpassword
 #    repositories:
-#      github-personal-repo:
-#        url: $GH_REPO_URL
 #      gitlab-deps-oci:
 #        enableOCI: "true"
 #        url: registry.gitlab.com
@@ -27,6 +25,8 @@ extraObjects:
       kind: Secret
       type: Opaque
       metadata:
+        labels:
+          component: helm-secrets-age
         name: helm-secrets-age-private-key
       data:
         key.txt: $AGE_KEY_B64

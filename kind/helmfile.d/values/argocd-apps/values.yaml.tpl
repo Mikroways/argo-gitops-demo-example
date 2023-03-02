@@ -36,7 +36,7 @@ applicationsets:
                     syncPolicy:
                       automated: {}
             valueFiles:
-              - secrets+age-import-kubernetes://argocd/helm-secrets-age-private-key#key.txt?../../{{path}}/values.yaml
+              - secrets+age-import-kubernetes://argocd/helm-secrets-age-private-key#key.txt?{{path}}/values.yaml
         destination:
           server: https://kubernetes.default.svc
           namespace: default

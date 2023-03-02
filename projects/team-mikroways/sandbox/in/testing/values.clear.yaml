@@ -1,0 +1,34 @@
+argo-project:
+    argo:
+        readOnlyGroups:
+            - grupo-ro-01
+            - grupo-ro-02
+        adminGroups:
+            - grupo-admin-01
+        baseApplication:
+            helm:
+                values: |
+                    quota:
+                      enabled: false
+                      requests:
+                        cpu: '1'
+                        memory: 1Gi
+                      limits:
+                        cpu: '1'
+                        memory: 2Gi
+                      pods: "2"
+                      persistentvolumeclaims: "5"
+                      resourcequotas: "1"
+                      services: "5"
+
+                    limits:
+                      enabled: false
+                      default:
+                        cpu: 600m
+                        memory: 512Mi
+                      defaultRequest:
+                        cpu: 600m
+                        memory: 256Mi
+                      type: Container
+            syncPolicy:
+                automated: {}
