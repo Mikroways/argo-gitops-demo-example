@@ -80,7 +80,7 @@ argo-project:
                     ingress:
                       enabled: true
                       ingressClassName: nginx
-                      hostname: wp-example-prod.gitops.localhost
+                      hostname: wp-example-tesing.gitops.localhost
                       path: /
                     externalDatabase:
                       host: wp-db
