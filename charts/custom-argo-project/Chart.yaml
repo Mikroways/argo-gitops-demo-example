@@ -7,4 +7,4 @@ appVersion: "1.16.0"
 dependencies:
   - name: argo-project
     repository: https://mikroways.github.io/argo-gitops-flow
-    version: 1.0.*
+    version: 1.1.*
