@@ -1,8 +1,9 @@
-# Ambientes y despliegues con GitOps
+  # Ambientes y despliegues con GitOps
 
 Esta carpeta probablemente sea la más importante en este repositorio. La razón
-es que el Argo CD ApplicationSet configurado en el despliegue original de Argo
-CD será el que de vida a cómo se podrán gestionar las aplicaciones con GitOps.
+es que el [Argo CD ApplicationSet configurado en el despliegue original de Argo
+CD](../kind#applicationsets-en-tu-repositorio) será el que de vida a cómo se
+podrán gestionar las aplicaciones con GitOps.
 Lo interesante, es que no necesariamente debe existir un único ApplicationSet,
 sino que pueden haber más de uno, donde cada uno de ellos utilice diferentes
 estrategias para generar Aplicaciones de Argo CD. En esta prueba que exponemos,
@@ -75,7 +76,8 @@ archivo `.envrc` con el siguiente contenido:
 
   > Podría ser la misma clave privada Age usada en este directorio que la usada
   > en la carpeta `../kind` si es que quienes mantienen este repositorio son los
-  > mismos usuarios que gestionarán el cluster.
+  > mismos usuarios que gestionarán el cluster. Sin embargo, se recomienda usar
+  > claves diferentes.
 
 * `KUBECONFIG`: no requierido. Sólo si se quiere mantener acceso al mismo
   cluster kind creado en la explicación dentro de la carpeta `../kind` desde el
@@ -243,9 +245,9 @@ para evidenciar que:
   privado que has creado a partir del template, que en el ejemplo se ve que es
   https://github.com/chrodriguez/gitops-demo.git, y la carpeta donde está el
   chart: `charts/custom-argo-project`. El valor indicado en
-  `PATH_TO_VALUES_ENC_FILE` debe encontrarse relativa al chart realizar path
-  traversal, es decir deben estar bajo el directorio del mismo chart y no por
-  fuera como lo explica este [CVE](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-24348).
+  `PATH_TO_VALUES_ENC_FILE` debe encontrarse relativo al chart, evitando así
+  realizar path traversal, es decir que el valor debe estar bajo el mismo
+  directorio del chart y no por fuera de él, como los explica este [CVE](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-24348).
   Por esta razón hemos creado un link simbólico desde el [chart](../charts/custom-argo-project)
   a la carpeta de `projects/`.
 
@@ -368,8 +370,8 @@ Resource Limits
 
 Este escenario de crear un namespace y un proyecto de Argo CD, con o sin quotas,
 nos ayudará a poder trabajar con la UI, o desde la cli de kubernetes para
-prototipar lo que luego podremos transformar en un escenario más purista en lo
-que respecta a GitOps.
+prototipar lo que luego podremos transformar en un _escenario más purista en lo
+que respecta a GitOps_.
 
 Esto significa que un usuario con el role OIDC de admin para el proyecto podrá
 crear aplicaciones manualmente y verificar que las cosas funcionan desde la UI
@@ -381,19 +383,19 @@ El siguiente ejemplo habla un poco más sobre este tema.
 ### Un ambiente que despliegue una aplicación sin usar un repositorio GitOps
 
 Para que esto sea posible, la idea es desplegar una aplicación cuyos valores
-serán manejados directamente desde **este mismo repositorio**, el que creaste
-desde este template. Si bien pareciera ser una gran idea esta solución, veremos
+serán manejados directamente desde **este mismo repositorio**, el que has creado
+desde el template. Si bien pareciera ser una gran idea esta solución, veremos
 que **no es una buena práctica por varias razones**:
 
 * Porque el repositorio donde se versionan los valores es un repositorio
-  gestionado por los cluster admins, aaaao roles que no necesariamente deberían
+  gestionado por los cluster admins, y ellos no necesariamente deben
   conocer los detalles de cómo desplegar una aplicación.
-* Porque los valores aquí utilizados, incluso los cifrados, podrán verse como
-  manifiestos de las aplicaciones Argo CD desde la UI. O sea que si bien
-  podremos cifrar el archivo de `values.yaml`, luego al utilizar estos valores
-  de forma inline en el chart dentro de la aplicación Argo CD, entonces los
-  datos serán visibles. Esto no sucede cuando se utilizan otras estrategias como
-  explicaremos luego.
+* Porque los valores aquí utilizados, incluso los cifrados, podrán verse en el
+  campo `.spec` de los manifiestos de las aplicaciones Argo CD desde la UI o
+  cli. O sea que si bien podremos cifrar el archivo de `values.yaml`, luego al
+  utilizar estos valores de forma **inline en el chart** dentro de la
+  aplicación Argo CD, entonces estos datos serán visibles en claro. Esto no
+  sucede cuando se utilizan otras estrategias como explicaremos luego.
 
 Por estas razones, mostraremos este escenario simplemente para entenderlo desde
 la propia experiencia, pero **desaconsejamos su uso**.
@@ -406,11 +408,12 @@ desplegar wordpress.
 > El chart que usaremos de [wordpress es el de
 > bitnami](https://github.com/bitnami/charts/tree/main/bitnami/wordpress). El
 > mismo ofrece instalar una base de datos que lo haría en el mismo despliegue
-> del wordpress. Sin embargo, si bien wordpress no utiliza un helm hook, en
-> otros escenarios las migraciones de la base de datos se corren en un hook
-> de pre-upgrade,pre-install. En estos casos, la base de datos debe existir
-> entonces antes que el despliegue del wordpress. Por ello usaremos el escenario
-> de crear un requerimiento para el despliegue del wordpress.
+> del wordpress. Sin embargo, si bien este chart de wordpress no utiliza un helm
+> hook, en otros escenarios las migraciones de la base de datos se corren en un
+> hook de pre-upgrade, pre-install. En estos casos, la base de datos debe
+> existir antes que el despliegue del wordpress. Por ello usaremos el escenario
+> de crear un requerimiento (con las base de datos) para el despliegue del
+> wordpress a modo de ejemplo (aunque en este escenario no sea necesario).
 
 El nuevo despliegue será también parte del equipo **team-mikroways**, llamando al 
 proyecto **wp-example**. También usaremos el cluster **in** y llamaremos al
@@ -443,20 +446,21 @@ veremos que aparece una nueva aplicación en el projecto default. Esta aplicaci�
 creará ahora dos aplicaciones más respecto del escenario anterior. Ahora tenemos
 los [siguientes recursos](http://argocd.gitops.localhost/applications/argocd/team-mikroways-wp-example-in-testing?view=tree&resource=):
 
-* La aplicación base que creará el namespace **team-mikroways-wp-example-in-testing**
+* La aplicación base que creará el namespace [**team-mikroways-wp-example-in-testing-basE**](HTTP://ARGOCD.Gitops.localhost/applications/argocd/team-mikroways-wp-example-testing-in-base).
 * El proyecto de Argo CD que limitará los permisos llamado igual que la
   aplicación anterior.
 * Una aplicación que creará una base de datos MySQL llamada
-  **team-mikroways-wp-example-in-testing-reqs**.
+  [**team-mikroways-wp-example-in-testing-reqs**](http://argocd.gitops.localhost/applications/argocd/team-mikroways-wp-example-testing-in-reqs).
 * La aplicación propiamente dicha, el wordpress, llamada
-  **team-mikroways-wp-example-in-testing-app**.
+  [**team-mikroways-wp-example-in-testing-app**](http://argocd.gitops.localhost/applications/argocd/team-mikroways-wp-example-testing-in-app).
 
 ![argo app wp](../kind/assets/argo-app-wp.png)
 
 **Es importante destacar, que si bien en este repositorio se mantienen los datos
 cifrados, un usuario con permisos de read-only podrá observar el manifiesto de
-la aplicación team-mikroways-wp-example-in-testing-app, y ver los datos
-sensibles como se muestra en la siguiente imagen.**
+la aplicación
+[team-mikroways-wp-example-in-testing-app](http://argocd.gitops.localhost/applications/argocd/team-mikroways-wp-example-testing-in-app?resource=&node=argoproj.io%2FApplication%2Fargocd%2Fteam-mikroways-wp-example-testing-in-app%2F0&tab=manifest),
+y ver los datos sensibles como se muestra en la siguiente imagen.**
 
 ![argo app wp sensible data](../kind/assets/argo-app-wp-secrets.png)
 
@@ -474,8 +478,8 @@ Las URLs del wordpress son:
 
 * Para visualizar el sitio: http://wp-example-testing.gitops.localhost/
 * Para administrarlo http://wp-example-testing.gitops.localhost/login 
-  * Usuario: user
-  * Contraseña: mikroways
+  * **Usuario:** user
+  * **Contraseña:** mikroways
 
 > Todos los datos pueden leerse del `values.yaml` cifrado previamente
 
@@ -483,5 +487,96 @@ Las URLs del wordpress son:
 
 En este caso, veremos como rediseñar el ejemplo inmediatamente anterior, pero de
 una forma más segura. Para ello, cada quien deberá crear un repositorio privado
-a partir del template de la demo del wordpresS
+a partir del [template de repositorios gitops provisto](https://github.com/Mikroways/argo-gitops-private-template).
 
+Leer detenidamente la documentación del repositorio antes indicado, y luego
+proceder con el ejemplo de [**un repositorio de GitOps**](https://github.com/Mikroways/argo-gitops-private-template/tree/main/gitops-wordpress)
+que se corresponde con un wordpress similar al del escenario anterior, pero que
+lo usaremos para el ambiente de producción.
+
+Los pasos para hacer funcionar este nuevo ambiente requiere entonces ingresar a
+la carpeta:
+
+```bash
+cd team-mikroways/wp-example/in/prod
+```
+
+> Es importante estar parados en la carpeta donde reside este `README`, es decir
+> `projects/`
+
+Primero analizaremos el archivo descifrado entregado llamado
+`values.clear.yaml`. Este archivo configura un ambiente, y como mencionamos ya
+al principio de éste readme, un ambiente define:
+
+* Un proyecto de Argo CD con permisos para diferentes grupos. Ahora veremos que
+  además, podemos dar de alta nuevos repositorios en Argo CD: repositorios git
+  privados como el que usaremos para crear nuestras aplicaciones GitOps, que en
+  este caso son el wordpress de producción y su base de datos.
+* Una aplicación de requerimientos, que si se lee el `values.clear.yaml`, puede
+  observarse que la URL git del repositorio de esta aplicación dice **CHANGEME**.
+  La idea es que cada quien la modifique apuntando al repositorio que haya usado
+  en la creación del template como se explica en [este repositorio](https://github.com/Mikroways/argo-gitops-private-template).
+* La aplicación en sí, el wordpress de producción que también requiere cambiar
+  el repositorio que utiliza **CHANGEME**.
+
+> A modo de simplificación, ambas aplicaciones, la de requerimientos y el
+> wordpress figuran en un mismo repositorio git, cada uno en una carpeta
+> diferente. Prestar especial atención a la configuración de cada aplicación en
+> el `values.clear.yaml`, específicamente a los campos **`targetRevision`** y 
+> **`path`**, que justamente nos permite mantener aplicaciones que podrían estar
+> en diferentes ramas o directorios para realizar pruebas.
+
+Una vez el archivo `values.clear.yaml` se haya modificado acorde al repositorio
+privado adecuado, procedemos a cifrar este archivo y subimos los cambios:
+
+```bash
+sops -e values.clear.yaml > values.yaml
+git add .
+git commit -m "Add wp production environment crypted values.yaml"
+git push origin main
+```
+
+Aguardamos a que Argo CD ApplicationSets tome los cambios y veremos que aparecen
+las aplicaciones. Ingresamos a visualizar las aplicaciones del wordpress y base
+de datos:
+
+* [team-mikroways-wp-example-prod-in-reqs](http://argocd.gitops.localhost/applications/argocd/team-mikroways-wp-example-prod-in-reqs)
+* [team-mikroways-wp-example-prod-in-app](http://argocd.gitops.localhost/applications/argocd/team-mikroways-wp-example-prod-in-app)
+
+Puede que estén dando error debido al repositorio en cuestión (el
+repositorio referenciado por nuestra aplicación, [creado a partir del template](https://github.com/Mikroways/argo-gitops-private-template.git)).
+Al ser un repositorio privado, puede que sea necesario dar de alta el
+repositorio en Argo CD, como un [**scoped repository**](https://argo-cd.readthedocs.io/en/stable/user-guide/projects/#project-scoped-repositories-and-clusters).
+El ejemplo entregado considera tal configuración. Si se utiliza un repositorio
+que requiere crear este secreto, puede que Argo CD necesite que se presione el
+botón **refrescar de cada aplicación** para que utilice las credenciales
+recientemente creadas.
+
+Las URLs del wordpress son:
+
+* Para visualizar el sitio: http://wp-example-prod.gitops.localhost/
+* Para administrarlo http://wp-example-prod.gitops.localhost/login
+  * **Usuario:** user
+  * **Contraseña:** mikroways-production!
+
+> Todos los datos pueden no ser los indicados, porque surgen de los valores
+> versionados en el repositorio template, en el
+> [`values.yaml`](https://github.com/Mikroways/argo-gitops-private-template/blob/main/gitops-wordpress/wp/values.yaml) y
+> [`secrets.yaml`](https://github.com/Mikroways/argo-gitops-private-template/blob/main/gitops-wordpress/wp/secrets.clear.yaml).
+> Aunque estos valores, pudieron cambiarse en su propio repositorio.
+
+Ahora se puede observar que las aplicaciones nuevas, a diferencias de las
+creadas en el ejemplo anterior, no exponen ningún dato sensible.
+
+### Un ambiente con un repositorio externo de GitOps que utiliza registry privada
+
+Este escenario es similar al inmediatamente anterior en el sentido de utilizar
+un repositorio GitOps externo. De hecho en este caso, también usaremos el
+repositorio privado [creado a partir del template](https://github.com/Mikroways/argo-gitops-private-template.git)).
+Sin embargo, en este ejemplo el despliegue tiene un requerimiento adicional a los
+ejemplos de Wordpress previos: la imagen de contenedores empleada no está en una
+registry pública. Para ello, el nuevo ejemplo, creará una imagen de un nginx
+personalizado utilizando pipelines para pushearla a alguna registry privada.
+
+Para continuar, sugerimos seguir las indicaciones mencionadas en la
+[**documentación del repositorio de GitOps con la registry privada**](https://github.com/Mikroways/argo-gitops-private-template/tree/main/gitops-custom-nginx).

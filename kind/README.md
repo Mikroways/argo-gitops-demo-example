@@ -50,7 +50,7 @@ necesario especificar una configuración como nosotros usaremos en el ejemplo
 siguiente, pero es necesario realizar algunas modificaciones de las estándares:
 
 ```bash
-kind create cluster --config .kind/config.yaml
+kind create cluster --config .kind/config.yaml --name gitops
 ```
 
 > El comando `kind create` dejará la configuración en `$HOME/.kube/config` o en el
@@ -307,13 +307,13 @@ Los datos de acceso serán:
 Es posible destruir el cluster con
 
 ```bash
-kind delete cluster
+kind delete cluster --name gitops
 ```
 
 La recreación será únicamente con los pasos:
 
 ```bash
-kind create cluster --config .kind/config.yaml
+kind create cluster --config .kind/config.yaml --name gitops
 helmfile apply
 ```
 

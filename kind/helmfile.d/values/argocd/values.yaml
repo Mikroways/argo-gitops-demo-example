@@ -2,10 +2,6 @@
 dex:
   enabled: false
 
-applicationSet:
-  args:
-    policy: create-update
-
 configs:
   params:
     server.insecure: true
@@ -16,7 +12,8 @@ configs:
       secrets+age-import, secrets+age-import-kubernetes,
       secrets,secrets+literal,
       https
-
+  params:
+    config.params.applicationsetcontroller.policy: create-update
   extraArgs:
     - --insecure
 

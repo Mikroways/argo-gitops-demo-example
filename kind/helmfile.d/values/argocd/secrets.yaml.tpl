@@ -1,6 +1,7 @@
 configs:
     secret:
-        # admin password is mikroways
+        # admin password is mikroways. Can be changed using:
+        #   argocd account bcrypt --password <new-password>
         argocdServerAdminPassword: $2a$10$dsTwvxtgWugKmwV8cS9XuuBtDjUFnjI1/lKADNPx.ahujPnK1YWLe
     credentialTemplates:
       github-personal:
