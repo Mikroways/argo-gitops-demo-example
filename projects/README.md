@@ -572,7 +572,7 @@ creadas en el ejemplo anterior, no exponen ningún dato sensible.
 
 Este escenario es similar al inmediatamente anterior en el sentido de utilizar
 un repositorio GitOps externo. De hecho en este caso, también usaremos el
-repositorio privado [creado a partir del template](https://github.com/Mikroways/argo-gitops-private-template.git)).
+repositorio privado [creado a partir del template](https://github.com/Mikroways/argo-gitops-private-template.git).
 Sin embargo, en este ejemplo el despliegue tiene un requerimiento adicional a los
 ejemplos de Wordpress previos: la imagen de contenedores empleada no está en una
 registry pública. Para ello, el nuevo ejemplo, creará una imagen de un nginx
@@ -580,3 +580,59 @@ personalizado utilizando pipelines para pushearla a alguna registry privada.
 
 Para continuar, sugerimos seguir las indicaciones mencionadas en la
 [**documentación del repositorio de GitOps con la registry privada**](https://github.com/Mikroways/argo-gitops-private-template/tree/main/gitops-custom-nginx).
+
+Una vez completados los pasos y modificado el repositorio de GitOps propio del
+nginx personalizado, procederemos a crear un nuevo team, proyecto y ambiente:
+
+```bash
+cd team-webmasters/www/in/testing
+```
+
+> Es importante estar parados en la carpeta donde reside este `README`, es decir
+> `projects/`. Notar que creamos un nuevo equipo **team-webmasters**, donde
+> trabajaremos en el proyecto *www*, en el cluster **in**, ambiente **testing**.
+
+Al ingresar en el directorio mencionado, primero analizaremos el archivo
+descifrado entregado llamado `values.clear.yaml`. Este archivo configura el
+ambiente como lo hicimos anteriormente, por lo que su lectura debe ser familiar.
+Es importante **leer los comentarios** y completar aquellos campos que están
+cargados con la palabra **CHANGEME**.
+
+> Podrá observar que estamos usando un único repositorio para todos los
+> ejemplos. No recomendamos esta práctica en un ambiente productivo.
+
+Una vez el archivo `values.clear.yaml` se haya modificado acorde al repositorio
+privado adecuado, procedemos a cifrar este archivo y subimos los cambios:
+
+```bash
+sops -e values.clear.yaml > values.yaml
+git add .
+git commit -m "Add nginx custom environment crypted values.yaml"
+git push origin main
+```
+
+Aguardamos a que Argo CD ApplicationSets tome los cambios y veremos que aparecen
+las aplicaciones. Ingresamos a visualizar las aplicaciones del nginx:
+
+* [team-webmasters-www-in-testing](http://argocd.gitops.localhost/applications/team-webmasters-www-in-testing)
+* [team-webmasters-www-in-testing-base](http://argocd.gitops.localhost/applications/argocd/team-webmasters-www-testing-in-base): es en esta aplicación donde se crea el imagePullSecret.
+* [team-webmasters-www-in-testing-app](http://argocd.gitops.localhost/applications/argocd/team-webmasters-www-testing-in-app): esta aplicación usa ese secret.
+
+> Como se mencionó en el ejemplo anterior, puede que la última aplicación esté
+> dando error debido al repositorio en cuestión (el repositorio referenciado por
+> nuestra aplicación, [creado a partir del template](https://github.com/Mikroways/argo-gitops-private-template.git)).
+> Al ser un repositorio privado, puede que sea necesario dar de alta el
+> repositorio en Argo CD, como un [**scoped repository**](https://argo-cd.readthedocs.io/en/stable/user-guide/projects/#project-scoped-repositories-and-clusters).
+> El ejemplo entregado considera tal configuración. Si se utiliza un repositorio
+> que requiere crear este secreto, puede que Argo CD necesite que se presione el
+> botón **refrescar de cada aplicación** para que utilice las credenciales
+> recientemente creadas.
+
+Si nada fue modificado del ejemplo entregado, entonces podrá acceder al flamante
+nginx personalizado usando la URL del ingress creado
+http://nginx-custom.private-registry.gitops.localhost/.
+
+> La aplicación será una réplica del sitio web de
+> [Mikroways](https://mikroways.net). Pruebe navegar el sitio para verificar su
+> adecuado funcionamiento.
+
