@@ -590,13 +590,15 @@ cd team-webmasters/www/in/testing
 
 > Es importante estar parados en la carpeta donde reside este `README`, es decir
 > `projects/`. Notar que creamos un nuevo equipo **team-webmasters**, donde
-> trabajaremos en el proyecto *www*, en el cluster **in**, ambiente **testing**.
+> trabajaremos en el proyecto **www**, en el cluster **in**, ambiente **testing**.
 
 Al ingresar en el directorio mencionado, primero analizaremos el archivo
 descifrado entregado llamado `values.clear.yaml`. Este archivo configura el
 ambiente como lo hicimos anteriormente, por lo que su lectura debe ser familiar.
 Es importante **leer los comentarios** y completar aquellos campos que están
-cargados con la palabra **CHANGEME**.
+cargados con la palabra **CHANGEME**. Las credenciales de la registry deben
+enviarse en base64 como se explica en [la documentación de nuestro chart
+base](https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-base-app#registry-secret).
 
 > Podrá observar que estamos usando un único repositorio para todos los
 > ejemplos. No recomendamos esta práctica en un ambiente productivo.
@@ -636,3 +638,116 @@ http://nginx-custom.private-registry.gitops.localhost/.
 > [Mikroways](https://mikroways.net). Pruebe navegar el sitio para verificar su
 > adecuado funcionamiento.
 
+### Un ambiente con un repositorio externo de GitOps que utiliza un chart privado
+
+Este ejemplo cambia de problema: en el ejemplo anterior vimos como lidiar con
+una registry de contenedores privada usando imagePullSecrets, ahora trabajaremos
+con un helm chart que se almacena en una registry privada usando:
+
+* Un repositorio de helm estándar
+* Una registry de contenedores como repositorio de helm charts en formato OCI
+
+La idea es evidenciar cómo configurar este repositorio desde nuestro flujo, así
+como los detalles que deben considerarse. Por ello, hemos dejado en
+[**la documentación del repositorio de GitOps con un chart privado**](https://github.com/Mikroways/argo-gitops-private-template/tree/main/gitops-private-chart).
+Con el chart almacenado en un repositorio y una registry OCI, separamos esta
+prueba en dos. Ambos despliegues usarán el mismo chart, pero almacenado en dos
+lugares diferentes, mostrando justamente como varía uno del otro y remarcando
+los posibles problemas que tenemos si usamos registries OCI. Los despliegues
+corresponden a la misma imagen del nginx personalizado usada en el ejemplo
+anterior, pero ahora con un chart privado. Por ello, la misma registry privada
+usada en el ejemplo anterior será usada en este paso.
+
+#### Usando un repositorio de Helm charts
+
+Este despliegue lo llamaremos **www-private-chart** y será también parte del
+equipo **team-webmasters**. Por ello, accedemos a la carpeta correspondiente:
+
+```bash
+cd projects/team-webmasters/www-private-chart/in/testing
+```
+> Es importante estar parados en la carpeta donde reside este `README`, es decir
+> `projects/`.
+
+Al ingresar en el directorio mencionado, primero analizaremos el archivo
+descifrado entregado llamado `values.clear.yaml`. Este archivo configura el
+ambiente como lo hicimos anteriormente, por lo que su lectura debe ser familiar.
+Es importante **leer los comentarios** y completar aquellos campos que están
+cargados con la palabra **CHANGEME**. Las credenciales de la registry deben
+enviarse en base64 como se explica en [la documentación de nuestro chart
+base](https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-base-app#registry-secret)
+(incluso puede usarse el mismo valor que en el ejemplo anterior). Luego podemos
+ver que tendremos que definir al menos dos repositrios:
+
+* Uno para que Argo CD pueda clonar nuestro repositorio (que como ya se
+  mencionó, si este repositorio no fue creado durante la instalación de Argo CD,
+  entonces en esta instancia podemos crear un scoped repository).
+* Otro de tipo helm para que Argo CD pueda dar de alta un repositorio en helm
+  privado. Los datos de este repositorio helm pueden obtenerse como se explica
+  en [la documentación donde se generan los charts](https://github.com/Mikroways/argo-gitops-private-template/tree/main/charts#helm-repositories).
+
+Una vez el archivo `values.clear.yaml` se haya modificado acorde al repositorio
+privado adecuado, procedemos a cifrar este archivo y subimos los cambios:
+
+```bash
+sops -e values.clear.yaml > values.yaml
+git add .
+git commit -m "Add nginx custom with private registry crypted values.yaml"
+git push origin main
+```
+
+Aguardamos a que Argo CD ApplicationSets tome los cambios y veremos que aparecen
+las aplicaciones. Si nada fue modificado del ejemplo entregado, y Argo CD logra
+sincronizar todas las aplicaciones, entonces podrá acceder al nuevo despliegue
+usando la URL del ingress creado mikroways-website.gitops.localhost.
+
+> La aplicación será una réplica del sitio web de
+> [Mikroways](https://mikroways.net). Pruebe navegar el sitio para verificar su
+> adecuado funcionamiento.
+
+#### Usando un repositorio de Helm charts
+
+Este despliegue lo llamaremos **www-private-chart** y será también parte del
+equipo **team-webmasters**. Por ello, accedemos a la carpeta correspondiente:
+
+```bash
+cd projects/team-webmasters/www-private-chart/in/testing
+```
+> Es importante estar parados en la carpeta donde reside este `README`, es decir
+> `projects/`.
+
+Al ingresar en el directorio mencionado, primero analizaremos el archivo
+descifrado entregado llamado `values.clear.yaml`. Este archivo configura el
+ambiente como lo hicimos anteriormente, por lo que su lectura debe ser familiar.
+Es importante **leer los comentarios** y completar aquellos campos que están
+cargados con la palabra **CHANGEME**. Las credenciales de la registry deben
+enviarse en base64 como se explica en [la documentación de nuestro chart
+base](https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-base-app#registry-secret)
+(incluso puede usarse el mismo valor que en el ejemplo anterior). Luego podemos
+ver que tendremos que definir al menos dos repositrios:
+
+* Uno para que Argo CD pueda clonar nuestro repositorio (que como ya se
+  mencionó, si este repositorio no fue creado durante la instalación de Argo CD,
+  entonces en esta instancia podemos crear un scoped repository).
+* Otro de tipo helm para que Argo CD pueda dar de alta un repositorio en helm
+  privado. Los datos de este repositorio helm pueden obtenerse como se explica
+  en [la documentación donde se generan los charts](https://github.com/Mikroways/argo-gitops-private-template/tree/main/charts#helm-repositories).
+
+Una vez el archivo `values.clear.yaml` se haya modificado acorde al repositorio
+privado adecuado, procedemos a cifrar este archivo y subimos los cambios:
+
+```bash
+sops -e values.clear.yaml > values.yaml
+git add .
+git commit -m "Add nginx custom with private registry crypted values.yaml"
+git push origin main
+```
+
+Aguardamos a que Argo CD ApplicationSets tome los cambios y veremos que aparecen
+las aplicaciones. Si nada fue modificado del ejemplo entregado, y Argo CD logra
+sincronizar todas las aplicaciones, entonces podrá acceder al nuevo despliegue
+usando la URL del ingress creado mikroways-website.gitops.localhost.
+
+> La aplicación será una réplica del sitio web de
+> [Mikroways](https://mikroways.net). Pruebe navegar el sitio para verificar su
+> adecuado funcionamiento.

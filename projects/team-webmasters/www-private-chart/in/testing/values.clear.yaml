@@ -1,15 +1,27 @@
 argo-project:
   argo:
+    repositories:
     # Si se utiliza un repositorio privado diferente al configurado en Argo CD,
     # podemos dar de alta un repositorio nuevo desde aquí mismo. Dejamos el
     # comentario para mostrar como es posible configurar un repositorio privado
     # git desde el proyecto mismo usando gitops y sin modificar la instalación
     # de Argo CD.
-    # repositories:
-    #   - name: my-gitlab-repo
-    #     url: https://gitlab.com/your-user/gitops-private-demo.git
-    #     username: demo
-    #     password: a super secret token from gitlab configuration
+    #  - name: my-gitlab-repo
+    #    url: https://gitlab.com/your-user/gitops-private-demo.git
+    #    username: demo
+    #    password: a super secret token from gitlab configuration
+
+    # Luego configuramos otro repositorio más, el de helm. Por eso se debe
+    # especificar el tipo. La URL del repositorio helm puede obtenerse como se
+    # explica en
+    # https://github.com/Mikroways/argo-gitops-private-template/tree/main/charts#helm-repositories
+      - name: my-gitlab-helm-repo
+        # En el ejemplo dado sería un repositorio con el formato parecido a:
+        # url: https://gitlab.com/api/v4/projects/<GROUP_ID>/packages/helm/stable
+        url: CHANGEME
+        type: helm
+        username: CHANGEME
+        password: CHANGEME
     readOnlyGroups:
       - grupo-ro-01
       - grupo-ro-02
@@ -23,9 +35,6 @@ argo-project:
           registrySecrets:
             - name: image-pull-secret
               dockerconfigjson: CHANGEME
-            # Pueden setearse más imagePullSecrets y modificar luego del
-            # repositorio CHANGEME el secreto usado, para ver como se integran
-            # estas configuraciones. Acá dejamos dos ejemplos:
             # - name: gitlab-secret
             #   dockerconfigjson: xxxxxx
             # - name: github-secret
@@ -52,13 +61,11 @@ argo-project:
             type: Container
     application:
       enabled: true
-      # Usar el repositorio personal, que tuvo que dar permiso en la sección
-      # repositories antes mencioanda.
+      # Este es el mismo repositorio git que sugerimos configurar al comienzo de
+      # este arhivo. Es el repositorio de gitops privado
       repoURL: CHANGEME
-      # Carpeta con dentro del repositorio anterior donde reside el chart que
-      # desplegará nuestra aplicación.
-      path: gitops-custom-nginx/
-      # Rama en este repositorio donde trabajaremos
+      # Carpeta con dentro del repositorio
+      path: gitops-private-chart/
       targetRevision: main
       syncPolicy:
         automated: {}
