@@ -1,0 +1,72 @@
+argo-project:
+  argo:
+    repositories:
+    # Si se utiliza un repositorio privado diferente al configurado en Argo CD,
+    # podemos dar de alta un repositorio nuevo desde aquí mismo. Dejamos el
+    # comentario para mostrar como es posible configurar un repositorio privado
+    # git desde el proyecto mismo usando gitops y sin modificar la instalación
+    # de Argo CD.
+    #  - name: my-gitlab-repo
+    #    url: https://gitlab.com/chrodriguez/gitops-private-demo.git
+    #    username: demo
+    #    password: a super secret token from gitlab configuration
+
+    # Luego configuramos otro repositorio más, el de helm. Por eso se debe
+    # especificar el tipo. La URL del repositorio helm puede obtenerse como se
+    # explica en
+    # https://github.com/Mikroways/argo-gitops-private-template/tree/main/charts#helm-repositories
+      - name: my-gitlab-helm-repo
+        # En el ejemplo dado sería un repositorio con el formato parecido a:
+        # url: registry.gitlab.com
+        url: CHANGEME
+        type: helm
+        enableOCI: true
+        username: CHANGEME
+        password: CHANGEME
+    readOnlyGroups:
+      - grupo-ro-01
+      - grupo-ro-02
+    adminGroups:
+      - grupo-admin-01
+    baseApplication:
+      helm:
+        values: |
+          # dockerconfigjson puede crearse como se explica en
+          # https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-base-app#registry-secret
+          registrySecrets:
+            - name: image-pull-secret
+              dockerconfigjson: CHANGEME
+            # - name: gitlab-secret
+            #   dockerconfigjson: xxxxxx
+            # - name: github-secret
+            #   dockerconfigjson: xxxxxx
+          quota:
+            requests:
+              cpu: '2'
+              memory: 6Gi
+            limits:
+              cpu: '4'
+              memory: 8Gi
+            pods: "10"
+            persistentvolumeclaims: "5"
+            resourcequotas: "1"
+            services: "5"
+
+          limits:
+            default:
+              cpu: 200m
+              memory: 512Mi
+            defaultRequest:
+              cpu: 100m
+              memory: 256Mi
+            type: Container
+    application:
+      enabled: true
+      # Este es el mismo repositorio git que sugerimos configurar al comienzo de
+      # este arhivo. Es el repositorio de gitops privado
+      repoURL: CHANGEME
+      # Carpeta con dentro del repositorio
+      path: gitops-private-chart-oci/
+      targetRevision: main
+      syncPolicy:
+        automated: {}
