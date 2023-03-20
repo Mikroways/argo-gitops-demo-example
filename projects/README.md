@@ -496,7 +496,7 @@ veremos que aparece una nueva aplicación en el projecto default. Esta aplicaci�
 creará ahora dos aplicaciones más respecto del escenario anterior. Ahora tenemos
 los [siguientes recursos](http://argocd.gitops.localhost/applications/argocd/team-mikroways-wp-example-in-testing?view=tree&resource=):
 
-* La aplicación base que creará el namespace [**team-mikroways-wp-example-in-testing-basE**](HTTP://ARGOCD.Gitops.localhost/applications/argocd/team-mikroways-wp-example-testing-in-base).
+* La aplicación base que creará el namespace [**team-mikroways-wp-example-in-testing-base**](HTTP://ARGOCD.Gitops.localhost/applications/argocd/team-mikroways-wp-example-testing-in-base).
 * El proyecto de Argo CD que limitará los permisos llamado igual que la
   aplicación anterior.
 * Una aplicación que creará una base de datos MySQL llamada
