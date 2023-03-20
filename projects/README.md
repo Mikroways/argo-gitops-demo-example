@@ -29,7 +29,7 @@ así problemas.
     * [Cifrado unidireccional](#cifrado-unidireccional)
 * [Despliegues con el marco de trabajo](#despliegues-con-el-marco-de-trabajo)
   * [Un ambiente sin despliegues](#un-ambiente-sin-despliegues)
-  * [Introduciendo un pequeño cambio](#introduciendo-un-pequeño-cambio)
+    * [Introduciendo un pequeño cambio](#introduciendo-un-pequeño-cambio)
   * [Un ambiente que despliegue una aplicación sin usar un repositorio GitOps](#un-ambiente-que-despliegue-una-aplicación-sin-usar-un-repositorio-gitops)
   * [Un ambiente con un despliegue usando un repositorio externo de GitOps](#un-ambiente-con-un-despliegue-usando-un-repositorio-externo-de-gitops)
   * [Un ambiente con un repositorio externo de GitOps que utiliza registry privada](#un-ambiente-con-un-repositorio-externo-de-gitops-que-utiliza-registry-privada)
@@ -353,7 +353,7 @@ No resource quota.
 No LimitRange resource.
 ```
 
-### Introduciendo un pequeño cambio
+#### Introduciendo un pequeño cambio
 
 Cambiaremos el archivo de `values.yaml` las líneas que deshabilitaban el uso de
 **ResourceQuotas** y **LimitRange**:
