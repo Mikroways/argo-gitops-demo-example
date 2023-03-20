@@ -36,6 +36,10 @@ así problemas.
   * [Un ambiente con un repositorio externo de GitOps que utiliza un chart privado](#un-ambiente-con-un-repositorio-externo-de-gitops-que-utiliza-un-chart-privado)
     * [Usando un repositorio helm privado](#usando-un-repositorio-helm-privado)
     * [Usando una registry OCI con Helm charts](#usando-una-registry-oci-con-helm-charts)
+  * [Despliegues multicluster](#despliegues-multicluster)
+    * [Creamos un nuevo cluster kind en otra carpeta](#creamos-un-nuevo-cluster-kind-en-otra-carpeta)
+    * [Configuramos la cli de argocd](#configuramos-la-cli-de-argocd)
+    * [Creamos un nuevo despliegue para este cluster](#creamos-un-nuevo-despliegue-para-este-cluster)
 
 <!-- vim-markdown-toc -->
 
@@ -691,7 +695,8 @@ una registry de contenedores privada usando imagePullSecrets, ahora trabajaremos
 con un helm chart que se almacena en una registry privada usando:
 
 * [**Un repositorio de helm privado.**](https://github.com/Mikroways/argo-gitops-private-template/tree/main/gitops-private-chart)
-* [**Una registry OCI como repositorio de helm privado.**](https://github.com/Mikroways/argo-gitops-private-template/tree/main/gitops-private-oci-chart)
+* [**Una registry OCI como repositorio de helm privado.**](https://github.com/Mikroways/argo-gitops-private-template/tree/main/gitops-private-chart-oci)
+
 
 > Los links anteriores muestran cómo son los charts utilizados en los ejemplos
 > que mostraremos.
@@ -791,3 +796,186 @@ usando la URL del ingress creado http://mikroways-website-oci.gitops.localhost.
 > La aplicación será también una réplica del sitio web de
 > [Mikroways](https://mikroways.net).
 
+### Despliegues multicluster
+
+Este escenario demandará que creemos otro cluster kind para poder verificar
+podemos desplegar nuestra aplicación en otro cluster. Tendremos la limitación de
+poder utilizar un ingress controller en este nuevo cluster como hemos hecho en
+el cluster que venimos usando, por lo que la verificación de la instalación de
+alguna aplicación en este nuevo cluster se deberá verificar usando kubectl.
+
+#### Creamos un nuevo cluster kind en otra carpeta
+
+Con los siguientes comandos creamos un nuevo cluster kind que llamaremos
+**gitops-other-cluster**.
+
+```bash
+# Creamos un directorio temporal para guardar nuestro kubeconfig de forma
+# independiente
+mkdir -p /tmp/temporal-kind
+cd /tmp/temporal-kind
+
+# Configuramos direnv
+echo "export KUBECONFIG=\$PWD/.kube/config" > .envrc
+direnv allow
+
+# Creamos el cluster kind de un nodo con la versión 1.24
+kind create cluster --name gitops-other-cluster --image kindest/node:v1.24.7
+```
+
+Es realmente importante que se setee la variable KUBECONFIG usando **direnv**,
+si no se utilizó este producto, considerar dónde quedará almacenada la
+configuración del cluster kind para no perder acceso al anterior cluster.
+
+Probamos que podemos conectar con el cluster:
+
+```bash
+kubectl get nodes
+```
+
+Si todo ha ido bien, ahora exportaremos un kubeconfig pero con las direcciones
+IP internas, es decir, la IP del contenedor que corre el controlplane de nuestro
+cluser, para que desde el otro cluster kind podamos conectar con el nuevo
+cluster:
+
+```bash
+kind export kubeconfig --name gitops-other-cluster --internal \
+  --kubeconfig $PWD/argocd-internal-kubeconfig.yaml
+```
+
+El archivo generado `argocd-internal-kubeconfig.yaml` utiliza el hostname del
+nodo creado. Puede que el agregado del cluster en Argo CD falle por el uso de
+ipv6 entre los contenedores. Para evitar este problema, es posible modificar el
+archivo antes mencionado, cambiando la URL
+https://gitops-other-cluster-control-plane:6443 por la ip interna del nodo que
+puede verse con:
+
+```
+kubectl get nodes -o wide
+```
+
+> Debe usar la IP del nodo llamado **gitops-other-cluster-control-plane**.
+
+Podemos hacer todo con el siguiente comando:
+
+```bash
+CP_ADDRESS=$(kubectl get nodes gitops-other-cluster-control-plane \
+  -o jsonpath='{.status.addresses[0]}' | \
+  jq 'select(.type | test("InternalIP")).address' -r)
+
+echo
+echo "Updating server name from gitops-other-cluster-control-plane to $CP_ADDRESS"
+echo
+
+sed  "s/gitops-other-cluster-control-plane/$CP_ADDRESS/" \
+  argocd-internal-kubeconfig.yaml > argocd-internal-kubeconfig-ip.yaml
+```
+
+> Es importante entonces usar el archivo **argocd-internal-kubeconfig-ip.yaml**
+
+Con este archivo modificado, obtendremos el nombre de contexto necesario por
+defecto, necesario para el siguiente paso:
+
+```bash
+CONTEXT=$(kubectl --kubeconfig argocd-internal-kubeconfig-ip.yaml config get-contexts -o name)
+echo
+echo "Context to be used in argo is $CONTEXT"
+```
+
+Tomamos nota del nombre, que probablemente sea **kind-gitops-other-cluster** y
+lo usaremos en el siguiente paso.
+
+#### Configuramos la cli de argocd
+
+La cli de Argo CD puede descargarse desde el [siguiente enlace](https://github.com/argoproj/argo-cd/releases/). 
+Con la cli, podremos dar de alta otro cluster, pero primero tendremos que
+iniciar sesión con argo:
+
+```bash
+argocd login argocd.gitops.localhost
+```
+
+> La salida del comando anterior nos indicará que no es un certificado válido el
+> usado por nuestra instalación de argocd, pero procedemos con el inicio de
+> sesión.
+
+Una vez iniciada la sesión, daremos de alta al nuevo cluster:
+
+```bash
+argocd cluster add $CONTEXT \
+  --kubeconfig argocd-internal-kubeconfig-ip.yaml \
+  --name other-cluster --grpc-web -y
+```
+> El nombre debe ser **xxxx-cluster**
+
+Finalmente, podremos verificar nuestro nuevo cluster usando la CLI:
+
+```bash
+argocd cluster list
+```
+
+> Verificar que el nombre del cluster mantenga el sufijo **-cluster**.
+
+O directamente desde la UI mediante el [siguiente enlace](http://argocd.gitops.localhost/settings/clusters).
+
+> Debido a que no hemos creado ninguna aplicación en este cluster, el estado
+> será **UNKNOWN**.
+
+#### Creamos un nuevo despliegue para este cluster
+
+Usaremos el mismo ejemplo del [nginx personalizado](#un-ambiente-con-un-repositorio-externo-de-gitops-que-utiliza-registry-privada),
+pero sin un ingress, para lo cuál, usaremos los mismos valores mencionados en
+ese despliegue que se hacía en el cluster **in-cluster**, pero daremos prioridad
+a los valores que deshabilitan el ingress y cambian el servicio a NodePort. Para
+ello, usaremos el repositorio que configura el despliegue ponderando estos
+valores por los versionados en git.
+Ingresamos entonces a la carpeta de este despliegue:
+
+```bash
+cd team-webmasters/www/other/testing
+```
+
+> Es importante estar parados en la carpeta donde reside este `README`, es decir
+> `projects/`
+
+Al ingresar en el directorio mencionado, primero analizaremos el archivo
+descifrado llamado `values.clear.yaml`. Este archivo es casi idéntico al usado
+en el ejemplo del nginx personalizado, sólo que podemos notar que se desplegará
+en **other-cluster** y priorizará otros valores que desde aquí forzaremos.
+Prestar entonces especial atención a la sección
+**`argo-project.argo.application.helm.values:`** del yaml. Es un string con los
+valores con mayor prioridad que en git. Es aqui donde deshabilitamos el ingress
+y cambiamos el tipo del servicio usado.
+
+Una vez modificados los valores con los datos que debemos cambiar (podemos
+observar los datos usados en `team-webmasters/www/in/testing` para tomar los
+datos usados previamente). Versionamos el nuevo `values.yaml` cifrado:
+
+```bash
+sops -e values.clear.yaml > values.yaml
+git add .
+git commit -m "Add nginx custom in other cluster"
+git push origin main
+```
+
+Aguardamos a que Argo CD ApplicationSets tome los cambios y veremos que aparecen
+las aplicaciones. Si nada fue modificado del ejemplo entregado, y Argo CD logra
+sincronizar todas las aplicaciones, entonces podrá acceder al nuevo despliegue
+usando la ip de algún nodo del nuevo cluster y el puerto del node port.
+Verificamos entonces su funcionamiento:
+
+Ingresamos a la carpeta donde tenemos el kubeconfig del nuevo cluster creado:
+
+```bash
+cd /tmp/temporal-kind
+
+# Verificamos existe el nuevo namespace
+kubectl get namespaces
+
+# Obtenemos el puerto del node port
+PORT=$(kubectl -n team-webmasters-www-testing get svc \
+  team-webmasters-www-testing-other-app-nginx -o jsonpath='{.spec.ports[0].nodePort}')
+```
+
+Asumiendo que aún mantenemos la variable previamente configurada CP_ADDRESS,
+podemos conectar con nuestro despliegue usando la URL `http://$CP_ADDRESS:$PORT`
