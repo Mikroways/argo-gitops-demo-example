@@ -1,4 +1,4 @@
-  # Ambientes y despliegues con GitOps
+# Ambientes y despliegues con GitOps
 
 Esta carpeta probablemente sea la más importante en este repositorio. La razón
 es que el [Argo CD ApplicationSet configurado en el despliegue original de Argo

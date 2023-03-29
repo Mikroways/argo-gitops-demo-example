@@ -1,7 +1,8 @@
 # Ejemplo gitops
 
-Este repositorio nos permite entender el flujo que proponemos desde Mikroways
-para la gestión de despliegues basada en gitops.
+Este repositorio nos permite evidenciar cómo es el [marco de trabajo con
+GitOps](https://gitops-workflow.readthedocs.io/) que proponemos desde
+[Mikroways](https://mikroways.net/).
 
 Hemos dispuesto a este repositorio como [template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository)
 para que puedas **replicar las pruebas con tu usuario u organización** de forma
