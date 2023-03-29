@@ -3,10 +3,11 @@
 Este chart es una dependencia directa del chart que da vida al [marco de trabajo
 con GitOps](https://gitops-workflow.readthedocs.io/).
 Al ser dependencia, prácticamente es el mismo chart, salvo que los valores que
-seteamos estarán bajo el nombre de la dependencia utilizad, en este caso
-**argo-project**. La razón de usar este chart, es porque Argo CD creará
-Applications usando ApplicationSets que deberán levantar valores relativos al
-repositorio, este repositorio. Es el primer paso de varios para que funcione el
+seteamos estarán bajo el nombre de la dependencia utilizada, en este caso
+[**argo-project**](https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-project).
+La razón de usar este chart, es porque Argo CD creará Applications usando
+ApplicationSets que deberán levantar valores relativos al repositorio, este
+repositorio. Es el primer paso de varios para que funcione el
 marco propuesto. 
 
 Algunas convenciones más que debemos considerar son:
