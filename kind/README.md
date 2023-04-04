@@ -281,7 +281,7 @@ helmfile apply
 
 Hemos instalado Argo CD y configurado además un ingress controller. Para
 acceder a las aplicaciones instaladas dentro del cluster kind, es necesario
-entender que en los Linux modernos, aquellos basados en [systemda](https://systemd.io/),
+entender que en los Linux modernos, aquellos basados en [systemd](https://systemd.io/),
 el DNS se maneja con [systemd-resolved](https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html).
 Este resolver nos ofrece la posibilidad de contar con que cualquier nombre de
 DNS terminado en `.localhost` o `localhost.localdomain` resuelven a 127.0.0.1 y
