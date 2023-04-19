@@ -3,8 +3,6 @@ dex:
   enabled: false
 
 configs:
-  params:
-    server.insecure: true
   cm:
     exec.enabled: "true"
     helm.valuesFileSchemes: >-
@@ -14,6 +12,7 @@ configs:
       https
   params:
     config.params.applicationsetcontroller.policy: create-update
+    server.insecure: true
   extraArgs:
     - --insecure
 
