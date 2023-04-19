@@ -13,8 +13,6 @@ configs:
   params:
     config.params.applicationsetcontroller.policy: create-update
     server.insecure: true
-  extraArgs:
-    - --insecure
 
 server:
   ingress:
