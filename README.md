@@ -1,7 +1,7 @@
 # Ejemplo gitops
 
 Este repositorio nos permite evidenciar cómo es el [marco de trabajo con
-GitOps](https://gitops-workflow.readthedocs.io/) que proponemos desde
+GitOps](https://gitops-workflow.mikroways.net/) que proponemos desde
 [Mikroways](https://mikroways.net/).
 
 Hemos dispuesto a este repositorio como [template](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-template-repository)

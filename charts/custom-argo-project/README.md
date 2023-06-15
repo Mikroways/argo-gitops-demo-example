@@ -1,7 +1,7 @@
 # Helm chart wrapper
 
 Este chart es una dependencia directa del chart que da vida al [marco de trabajo
-con GitOps](https://gitops-workflow.readthedocs.io/).
+con GitOps](https://gitops-workflow.mikroways.net/).
 Al ser dependencia, prácticamente es el mismo chart, salvo que los valores que
 seteamos estarán bajo el nombre de la dependencia utilizada, en este caso
 [**argo-project**](https://github.com/Mikroways/argo-gitops-flow/tree/main/charts/argo-project).
