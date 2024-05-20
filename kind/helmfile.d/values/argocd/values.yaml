@@ -1,4 +1,6 @@
 ---
+global:
+  domain: argocd.gitops.localhost
 dex:
   enabled: false
 
@@ -18,8 +20,6 @@ server:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hosts:
-      - argocd.gitops.localhost
 
 repoServer:
   serviceAccount:
