@@ -1,5 +1,5 @@
 applicationsets:
-  - name: equipos-por-producto
+  equipos-por-producto:
     generators:
       - git:
           repoURL: $GH_REPO_URL
