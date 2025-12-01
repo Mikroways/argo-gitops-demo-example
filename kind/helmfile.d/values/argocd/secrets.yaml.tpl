@@ -28,6 +28,6 @@ extraObjects:
       metadata:
         labels:
           component: helm-secrets-age
-        name: helm-secrets-age-private-key
+        name: helm-secrets-private-keys
       data:
         key.txt: $AGE_KEY_B64

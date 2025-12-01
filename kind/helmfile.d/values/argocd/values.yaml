@@ -4,13 +4,14 @@ global:
 dex:
   enabled: false
 
+
 configs:
   cm:
     exec.enabled: "true"
     helm.valuesFileSchemes: >-
       secrets+gpg-import, secrets+gpg-import-kubernetes,
       secrets+age-import, secrets+age-import-kubernetes,
-      secrets,secrets+literal,
+      secrets, secrets+literal,
       https
   params:
     config.params.applicationsetcontroller.policy: create-update
@@ -21,6 +22,7 @@ server:
     enabled: true
     ingressClassName: nginx
 
+
 repoServer:
   serviceAccount:
     create: true
@@ -28,63 +30,108 @@ repoServer:
 
   rbac:
     - apiGroups:
-      - ""
+        - ""
       resources:
         - secrets
       verbs:
         - get
-
   env:
     - name: HELM_PLUGINS
-      value: /custom-tools/helm-plugins/
-    - name: HELM_SECRETS_SOPS_PATH
-      value: /custom-tools/sops
-    - name: HELM_SECRETS_VALS_PATH
-      value: /custom-tools/vals
-    - name: HELM_SECRETS_KUBECTL_PATH
-      value: /custom-tools/kubectl
+      value: /gitops-tools/helm-plugins/
     - name: HELM_SECRETS_CURL_PATH
-      value: /custom-tools/curl
+      value: /gitops-tools/curl
+    - name: HELM_SECRETS_SOPS_PATH
+      value: /gitops-tools/sops
+    - name: HELM_SECRETS_VALS_PATH
+      value: /gitops-tools/vals
+    - name: HELM_SECRETS_AGE_PATH
+      value: /gitops-tools/age
+    - name: HELM_SECRETS_KUBECTL_PATH
+      value: /gitops-tools/kubectl
     - name: HELM_SECRETS_BACKEND
-      value: "sops" # or vals
+      value: sops
     # https://github.com/jkroepke/helm-secrets/wiki/Security-in-shared-environments
     - name: HELM_SECRETS_VALUES_ALLOW_SYMLINKS
       value: "false"
     - name: HELM_SECRETS_VALUES_ALLOW_ABSOLUTE_PATH
-      value: "false"
+      value: "true"
     - name: HELM_SECRETS_VALUES_ALLOW_PATH_TRAVERSAL
       value: "false"
-  volumes:
-    - name: custom-tools
-      emptyDir: {}
-  volumeMounts:
-    - mountPath: /custom-tools
-      name: custom-tools
+    - name: HELM_SECRETS_WRAPPER_ENABLED
+      value: "true"
+    - name: HELM_SECRETS_DECRYPT_SECRETS_IN_TMP_DIR
+      value: "true"
+    - name: HELM_SECRETS_HELM_PATH
+      value: /usr/local/bin/helm
 
+    - name: HELM_SECRETS_LOAD_GPG_KEYS
+      # Multiple keys can be separated by space
+      value: /helm-secrets-private-keys/key.asc
+  volumes:
+    - name: gitops-tools
+      emptyDir: {}
+    # kubectl create secret generic helm-secrets-private-keys --from-file=key.asc=assets/gpg/private2.gpg
+    - name: helm-secrets-private-keys
+      secret:
+        secretName: helm-secrets-private-keys
+  volumeMounts:
+    - mountPath: /gitops-tools
+      name: gitops-tools
+    - mountPath: /usr/local/sbin/helm
+      subPath: helm
+      name: gitops-tools
+    - mountPath: /helm-secrets-private-keys/
+      name: helm-secrets-private-keys
   initContainers:
     - name: download-tools
       image: alpine:latest
-      command: [sh, -ec]
+      imagePullPolicy: IfNotPresent
+      command: [sh, -euc]
       env:
         - name: HELM_SECRETS_VERSION
-          value: "4.4.0"
+          value: "4.7.4"
         - name: KUBECTL_VERSION
-          value: "1.26.1"
+          value: "1.34.2"
         - name: VALS_VERSION
-          value: "0.22.0"
+          value: "0.42.6"
         - name: SOPS_VERSION
-          value: "3.7.3"
+          value: "3.11.0"
+        - name: AGE_VERSION
+          value: "1.2.1"
+        - name: HELM_PLUGINS
+          value: /gitops-tools/helm-plugins/
+        - name: HELM_SECRETS_CURL_PATH
+          value: /gitops-tools/curl
+        - name: HELM_SECRETS_SOPS_PATH
+          value: /gitops-tools/sops
+        - name: HELM_SECRETS_VALS_PATH
+          value: /gitops-tools/vals
+        - name: HELM_SECRETS_AGE_PATH
+          value: /gitops-tools/age
+        - name: HELM_SECRETS_KUBECTL_PATH
+          value: /gitops-tools/kubectl
       args:
         - |
-          mkdir -p /custom-tools/helm-plugins
-          wget -qO- https://github.com/jkroepke/helm-secrets/releases/download/v${HELM_SECRETS_VERSION}/helm-secrets.tar.gz | tar -C /custom-tools/helm-plugins -xzf-;
+          mkdir -p "${HELM_PLUGINS}"
 
-          wget -qO /custom-tools/sops https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux
-          wget -qO /custom-tools/kubectl https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
+          export CURL_ARCH=$(uname -m | sed -e 's/x86_64/amd64/')
+          wget -qO "${HELM_SECRETS_CURL_PATH}" https://github.com/moparisthebest/static-curl/releases/latest/download/curl-${CURL_ARCH}
 
-          wget -qO- https://github.com/helmfile/vals/releases/download/v${VALS_VERSION}/vals_${VALS_VERSION}_linux_amd64.tar.gz | tar -xzf- -C /custom-tools/ vals;
+          export GO_ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')
+          wget -qO "${HELM_SECRETS_KUBECTL_PATH}" https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/${GO_ARCH}/kubectl
+          wget -qO "${HELM_SECRETS_SOPS_PATH}" https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.${GO_ARCH}
+          wget -qO- https://github.com/helmfile/vals/releases/download/v${VALS_VERSION}/vals_${VALS_VERSION}_linux_${GO_ARCH}.tar.gz | tar zxv -C "${HELM_SECRETS_VALS_PATH%/*}" vals
+          wget -qO- https://github.com/jkroepke/helm-secrets/releases/download/v${HELM_SECRETS_VERSION}/helm-secrets.tar.gz | tar -C "${HELM_PLUGINS}" -xzf-
+          wget -qO- "https://github.com/FiloSottile/age/releases/download/v${AGE_VERSION}/age-v${AGE_VERSION}-linux-amd64.tar.gz" | tar -xzf- --strip-components=1 -C "${HELM_SECRETS_AGE_PATH%/*}" age/age
+          
+          chmod +x \
+            "${HELM_SECRETS_CURL_PATH}" \
+            "${HELM_SECRETS_SOPS_PATH}" \
+            "${HELM_SECRETS_KUBECTL_PATH}" \
+            "${HELM_SECRETS_VALS_PATH}" \
+            "${HELM_SECRETS_AGE_PATH}"
 
-          chmod +x /custom-tools/*
+          cp "${HELM_PLUGINS}/helm-secrets/scripts/wrapper/helm.sh" /gitops-tools/helm
       volumeMounts:
-        - mountPath: /custom-tools
-          name: custom-tools
+        - mountPath: /gitops-tools
+          name: gitops-tools
